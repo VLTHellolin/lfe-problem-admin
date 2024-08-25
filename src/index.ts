@@ -34,8 +34,12 @@ const updateSuccess = function () {
     '<img src="https://cdn.luogu.com.cn/upload/image_hosting/i47l3bvw.png" width="40%"/>'
   );
 };
-const updateFailed = function (xhr: JQueryXHR, status: string, error: string) {
-  _feInstance.$swalError('操作失败', `${status}: ${error}`);
+const updateFailed = function (xhr: JQueryXHR, status: string) {
+  _feInstance.$swalError(
+    '操作失败',
+    `${status} ${xhr.status}: ${xhr.statusText}\n如果你认为这不是你的问题，请前往 GitHub 仓库反馈。\n错误信息已输出到控制台。`
+  );
+  console.error(xhr);
 };
 
 // Send update request to server.
