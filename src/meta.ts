@@ -1,9 +1,7 @@
 // Webpack says it's a CommonJS file, make it happy.
-
-// import pkg from '../package.json';
+// eslint-disable-next-line
 const pkg = require('../package.json');
 
-// export default {
 module.exports = {
   name: pkg.name,
   version: pkg.version,

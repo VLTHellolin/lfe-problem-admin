@@ -108,7 +108,7 @@ const difficultyHandler = function () {
 
 // Change tags.
 const tagsHandler = function () {
-  let state: number[] = Array.from(_feInjection.currentData.problem.tags);
+  const state: number[] = Array.from(_feInjection.currentData.problem.tags);
   let tagsHTML = `<br/><details class="sections"> <summary>点击展开标签</summary> <br/>
 <div class="section">
   <div data-v-abfce16a data-v-f9624136 class="search-box">
@@ -120,7 +120,7 @@ const tagsHandler = function () {
   </div>
 </div>`;
 
-  for (let section of problemTags) {
+  for (const section of problemTags) {
     tagsHTML += `<div class="section"> <div class="title">${section.name}</div> <div class="tags">`;
     tagsHTML += section.item
       .map(
@@ -145,7 +145,7 @@ const tagsHandler = function () {
   for (const i of problemTagIds) {
     $(`#problem-admin-tag-${i}`).on('click', function () {
       $(this).toggleClass('selected');
-      let num = state.indexOf(i);
+      const num = state.indexOf(i);
       if (num == -1) {
         state.push(i);
       } else {
