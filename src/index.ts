@@ -63,7 +63,7 @@ const dropdownHandler = function () {
 // Change solution.
 const solutionHandler = function () {
   let state = false;
-  _feInstance.$swalInfo('', '题解通道操作');
+  _feInstance.$swal('题解通道操作', '');
 
   const selectEl = $('.swal2-container .swal2-content > .swal2-checkbox');
   selectEl.css('display', 'block');
@@ -91,7 +91,7 @@ const difficultyHandler = function () {
     )
     .join('');
 
-  _feInstance.$swalInfo('', '题目难度操作');
+  _feInstance.$swal('题目难度操作', '');
 
   const selectEl = $('.swal2-container .swal2-content > .swal2-select');
   selectEl.css('display', 'block').html(diffHTML);
@@ -136,7 +136,7 @@ const tagsHandler = function () {
   }
   tagsHTML += '</details>';
 
-  _feInstance.$swalInfo('', '题目标签操作');
+  _feInstance.$swal('题目标签操作', '');
   $('.swal2-container .swal2-popup').addClass('swal2-tags-view');
 
   const selectEl = $('.swal2-container .swal2-content');
@@ -231,6 +231,14 @@ const loadMainEntrance = function () {
   margin: 1.5em 0;
 }
 </style>`;
+  if ($('.header > .functional > .operation').length === 0) {
+    // The page hasn't loaded yet.
+    return;
+  }
+  if ($('#problem-admin-btn').length) {
+    // The main entrance has loaded already.
+    return;
+  }
   $('.header > .functional > .operation').append(mainEntranceHTML);
   // Handle events.
   $('#problem-admin-btn').on('click', dropdownHandler);

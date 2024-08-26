@@ -22,6 +22,7 @@ export type FeSwalFunction = (
   text?: string
 ) => { params: { titleText: string; text: string; type: string } };
 export interface FeInstance {
+  $swal: FeSwalFunction;
   $swalInfo: FeSwalFunction;
   $swalWarning: FeSwalFunction;
   $swalError: FeSwalFunction;
