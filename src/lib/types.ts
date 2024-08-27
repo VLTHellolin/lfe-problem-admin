@@ -32,3 +32,9 @@ export interface FeInstance {
   $swalToastError: FeSwalFunction;
   $swalToastSuccess: FeSwalFunction;
 }
+export interface ModuleExports {
+  name?: string;
+  load: () => void | Promise<void>;
+  condition: () => boolean;
+  obCondition?: (e: Element) => boolean;
+}

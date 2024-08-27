@@ -53,13 +53,14 @@ const parse = function (data) {
       }
       idTable.push(i.id);
     } else if (i.type !== 6) {
+      // eslint-disable-next-line no-sparse-arrays
       res[[, 1, , , 0, 2][i.type]].item.push({ id: i.id, name: i.name });
       idTable.push(i.id);
     }
   }
 
   fs.writeFileSync(
-    './src/tags.json',
+    './src/data/tags.json',
     JSON.stringify({ tags: res, ids: idTable })
   );
 };
