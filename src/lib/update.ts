@@ -4,9 +4,11 @@ const API = '/sadmin/api/problem/partialUpdate/';
 
 const updateSuccess = function () {
   _feInstance.$swalSuccess('操作成功', '');
-  $('.swal2-container #swal2-content').append(
-    '<img src="https://cdn.luogu.com.cn/upload/image_hosting/i47l3bvw.png" width="40%"/>'
-  );
+  $('.swal2-container #swal2-content')
+    .show()
+    .append(
+      '<img src="https://cdn.luogu.com.cn/upload/image_hosting/i47l3bvw.png" width="40%"/>'
+    );
 };
 const updateFailed = function (xhr: JQueryXHR, status: string) {
   _feInstance.$swalError(
@@ -18,12 +20,16 @@ const updateFailed = function (xhr: JQueryXHR, status: string) {
 
 // Send update request to server.
 // If debug mode is enabled, it will only output an update info through the console.
-export const updateProblem = async function (info: Partial<ProblemInfo>) {
+export const updateProblem = async function (
+  info: Partial<ProblemInfo>,
+  onError = updateFailed,
+  onSuccess = updateSuccess
+) {
   await $.ajax(API + _feInjection.currentData.problem.pid, {
     method: 'POST',
     contentType: 'application/json',
     data: JSON.stringify(info),
-    error: updateFailed,
-    success: updateSuccess,
+    error: onError,
+    success: onSuccess,
   });
 };

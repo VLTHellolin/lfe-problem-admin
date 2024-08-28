@@ -6,7 +6,10 @@ module.exports = {
   name: pkg.name,
   version: pkg.version,
   connect: ['www.luogu.com.cn'],
-  match: ['*://www.luogu.com.cn/problem/*'],
+  match: [
+    '*://www.luogu.com.cn/problem*',
+    '*://www.luogu.com.cn/sadmin/article/review*',
+  ],
   description: pkg.description,
   author: pkg.author,
   updateURL:

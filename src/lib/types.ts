@@ -32,6 +32,24 @@ export interface FeInstance {
   $swalToastError: FeSwalFunction;
   $swalToastSuccess: FeSwalFunction;
 }
+export interface Review {
+  id: string;
+  author: number;
+  pid: string;
+  accepted: boolean;
+  time: string;
+}
+export interface ReviewHistory {
+  reasons: string;
+  accept: number;
+  decline: number;
+  data: Review[];
+}
+export interface ReasonsSection {
+  title: string;
+  list: { short: string; full: string }[];
+}
+export type ReasonsList = ReasonsSection[];
 export interface ModuleExports {
   name?: string;
   load: () => void | Promise<void>;
