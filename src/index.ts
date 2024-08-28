@@ -4,6 +4,7 @@ import 'jquery';
 declare global {
   const _feInjection: FeInjection;
   const _feInstance: FeInstance;
+  const GM_getResourceText: (name: string) => string;
 }
 
 import modules from './modules';

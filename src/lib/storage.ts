@@ -2,7 +2,7 @@ import { type ReviewHistory } from './types';
 
 const Name = 'problem-admin-history';
 
-export const getValue = function () {
+export const getHistory = function () {
   const result = localStorage.getItem(Name);
   if (result === null) {
     const newItem: ReviewHistory = {
@@ -11,17 +11,17 @@ export const getValue = function () {
       decline: 0,
       data: [],
     };
-    setValue(newItem);
+    setHistory(newItem);
     return newItem;
   } else {
     return JSON.parse(result) as ReviewHistory;
   }
 };
 
-export const setValue = function (e: ReviewHistory) {
+export const setHistory = function (e: ReviewHistory) {
   localStorage.setItem(Name, JSON.stringify(e));
 };
 
-export const removeValue = function () {
+export const removeHistory = function () {
   localStorage.removeItem(Name);
 };

@@ -1,6 +1,5 @@
 import { type TagsSection, type ModuleExports } from '../lib/types';
 import { updateProblem } from '../lib/update';
-import tagsData from '../data/tags.json';
 
 const problemDifficulties = [
   '暂无评定',
@@ -13,6 +12,7 @@ const problemDifficulties = [
   'NOI/NOI+/CTSC',
 ];
 const mapToOldDifficulty = (diff: number) => [0, 2, 3, 5, 6, 8, 10, 11][diff];
+const tagsData = JSON.parse(GM_getResourceText('tagsData'));
 const problemTags: TagsSection[] = tagsData.tags;
 const problemTagIds = tagsData.ids;
 

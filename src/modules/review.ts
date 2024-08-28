@@ -3,9 +3,9 @@ import {
   type ModuleExports,
   type ReasonsList,
 } from '../lib/types';
-import { getValue, removeValue, setValue } from '../lib/storage';
+import { getHistory, removeHistory, setHistory } from '../lib/storage';
 
-const Storage = getValue();
+const Storage = getHistory();
 const reasonsClipboard = await $.ajax(Storage.reasons, {
   method: 'GET',
   data: { _contentOnly: 1 },
@@ -31,6 +31,7 @@ const settingsHandler = function () {
     return;
   }
   Storage.reasons = newLink;
+  setHistory(Storage);
   window.alert('操作完成。');
   window.location.reload();
 };
@@ -44,7 +45,7 @@ const clearHandler = function () {
     window.confirm('确实要清除历史记录吗？\n所有数据将无法恢复！') &&
     window.confirm('第二次确认，确实要清除历史记录吗？')
   ) {
-    removeValue();
+    removeHistory();
     window.alert('操作完成。');
   }
 };
@@ -193,7 +194,7 @@ const updateHandler = function (e: Event) {
     };
     Storage.data.push(newItem);
 
-    setValue(Storage);
+    setHistory(Storage);
     updateViewHandler();
   });
 };
