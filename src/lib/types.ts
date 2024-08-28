@@ -41,6 +41,7 @@ export interface Review {
 }
 export interface ReviewHistory {
   reasons: string;
+  showAdminName: boolean;
   accept: number;
   decline: number;
   data: Review[];

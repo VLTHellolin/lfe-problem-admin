@@ -103,9 +103,11 @@ const updateHandler = function (e: Event) {
     }
 
     if (result.length !== 0) {
-      result.push(
-        `审核管理员；${getAdminName()}，对审核结果有异议请私信交流。`
-      );
+      if (Storage.showAdminName) {
+        result.push(
+          `审核管理员；${getAdminName()}，对审核结果有异议请私信交流。`
+        );
+      }
       const reason = result.join('；');
       detail.setReviewResult(false, reason);
       freeEditingPreview.val(reason);
@@ -162,6 +164,20 @@ const updateHandler = function (e: Event) {
     }
   }
   freeEditingArea.append('<br/>');
+
+  const adminNameEl = $(
+    `<input type="checkbox" ${Storage.showAdminName ? 'checked' : ''}/>`
+  );
+  freeEditingArea.before(
+    '<br/><br/>',
+    adminNameEl,
+    '<span>&nbsp;显示审核管理员</span>'
+  );
+  adminNameEl.on('change', () => {
+    Storage.showAdminName = !Storage.showAdminName;
+    setHistory(Storage);
+    changingReasonsHandler();
+  });
 
   const freeEditingTextarea = $(
     '<textarea data-v-33028704 data-v-17227e28 placeholder="其他理由"/>'

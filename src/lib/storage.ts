@@ -7,6 +7,7 @@ export const getHistory = function () {
   if (result === null) {
     const newItem: ReviewHistory = {
       reasons: 'https://www.luogu.com.cn/paste/pel0tgzp',
+      showAdminName: true,
       accept: 0,
       decline: 0,
       data: [],
