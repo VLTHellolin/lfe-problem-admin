@@ -4,6 +4,7 @@ import {
   type ReasonsList,
 } from '../lib/types';
 import { getHistory, removeHistory, setHistory } from '../lib/storage';
+import { updateProblem } from '../lib/update';
 
 const Storage = getHistory();
 const reasonsClipboard = await $.ajax(Storage.reasons, {
@@ -229,6 +230,20 @@ const updateHandler = function (e: Event) {
 
     setHistory(Storage);
     updateViewHandler();
+  });
+
+  $(
+    '#app .main-container .l-card.burger .body div:first-child blockquote'
+  ).after(
+    '<div data-v-4842157a><a data-v-bade3303 data-v-4842157a id="problem-admin-close">关闭本题题解通道</a></div>'
+  );
+  $('#problem-admin-close').on('click', () => {
+    updateProblem(
+      { acceptSolution: false },
+      article.solutionFor.pid,
+      () => window.alert('操作失败。'),
+      () => window.alert('操作成功。')
+    );
   });
 };
 

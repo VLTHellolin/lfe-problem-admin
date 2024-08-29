@@ -22,10 +22,11 @@ const updateFailed = function (xhr: JQueryXHR, status: string) {
 // If debug mode is enabled, it will only output an update info through the console.
 export const updateProblem = async function (
   info: Partial<ProblemInfo>,
+  pid: string = _feInjection.currentData.problem.pid,
   onError = updateFailed,
   onSuccess = updateSuccess
 ) {
-  await $.ajax(API + _feInjection.currentData.problem.pid, {
+  await $.ajax(API + pid, {
     method: 'POST',
     contentType: 'application/json',
     data: JSON.stringify(info),
