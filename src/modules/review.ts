@@ -282,6 +282,7 @@ const clearHandler = function () {
   ) {
     removeHistory();
     window.alert('操作完成。');
+    window.location.reload();
   }
 };
 
