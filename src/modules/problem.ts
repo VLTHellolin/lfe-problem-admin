@@ -1,5 +1,4 @@
-import { type TagsSection, type ModuleExports } from '../lib/types';
-import { updateProblem } from '../lib/update';
+import { type TagsSection, type ModuleExports, updateProblem } from '../lib';
 
 const problemDifficulties = [
   '暂无评定',

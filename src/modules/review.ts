@@ -2,12 +2,16 @@ import {
   type Review,
   type ModuleExports,
   type ReasonsList,
-} from '../lib/types';
-import { getHistory, removeHistory, setHistory } from '../lib/storage';
-import { updateProblem } from '../lib/update';
+  getHistory,
+  removeHistory,
+  setHistory,
+  updateProblem,
+} from '../lib';
 
-const Storage = getHistory();
-const reasonsClipboard = await $.ajax(Storage.reasons, {
+const storage = getHistory();
+
+// Get reasons list from luogu clipboard.
+const reasonsClipboard = await $.ajax(storage.reasons, {
   method: 'GET',
   data: { _contentOnly: 1 },
 });
@@ -22,43 +26,15 @@ const getAdminName = function () {
   return JSON.parse($('#lentille-context').text()).user.name;
 };
 
-const settingsHandler = function () {
-  const newLink = window.prompt(
-    '配置放置打回理由的云剪贴板（是否公开均可，注意更改剪贴板内容后需要刷新生效）：',
-    Storage.reasons
-  );
-
-  if (newLink === null || newLink === '') {
-    return;
-  }
-  Storage.reasons = newLink;
-  setHistory(Storage);
-  window.alert('操作完成。');
-  window.location.reload();
-};
-
-const historyHandler = function () {
-  $('#problem-admin-history').toggle();
-};
-
-const clearHandler = function () {
-  if (
-    window.confirm('确实要清除历史记录吗？\n所有数据将无法恢复！') &&
-    window.confirm('第二次确认，确实要清除历史记录吗？')
-  ) {
-    removeHistory();
-    window.alert('操作完成。');
-  }
-};
-
-const updateViewHandler = function () {
+// Render the total and weekly count in the history view.
+const renderHistoryCount = function () {
   let weekAccept = 0,
     weekDecline = 0;
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1);
   weekStart.setHours(0, 0, 0, 0);
-  for (let i = Storage.data.length - 1; i >= 0; i -= 1) {
-    const current = Storage.data[i];
+  for (let i = storage.data.length - 1; i >= 0; i -= 1) {
+    const current = storage.data[i];
     if (current.time < weekStart) {
       break;
     }
@@ -70,16 +46,20 @@ const updateViewHandler = function () {
   }
 
   $('#problem-admin-history-total').text(
-    `${Storage.accept + Storage.decline} / ${Storage.accept} / ${Storage.decline}`
+    `${storage.accept + storage.decline} / ${storage.accept} / ${storage.decline}`
   );
   $('#problem-admin-history-week').text(
     `${weekAccept + weekDecline} / ${weekAccept} / ${weekDecline}`
   );
+};
 
+// Render a list of articles in the history view.
+// Will show up to 50 recent articles.
+const renderHistoryList = function () {
   let listHTML = '<ul>';
   let counter = 0;
-  for (let i = Storage.data.length - 1; i >= 0; i -= 1) {
-    const current = Storage.data[i];
+  for (let i = storage.data.length - 1; i >= 0; i -= 1) {
+    const current = storage.data[i];
     listHTML += `<li>
     <a href="https://www.luogu.com.cn/article/${current.id}/edit">U${current.author} 作为 ${current.pid} 的题解</a>，${current.accepted ? '通过' : '打回'}，${current.time.toLocaleString('zh-CN')}
     </li>`;
@@ -91,29 +71,45 @@ const updateViewHandler = function () {
   listHTML += '</ul>';
   $('#problem-admin-list').html(listHTML);
 };
+
+const updateViewHandler = function () {
+  renderHistoryCount();
+  renderHistoryList();
+};
+
+// Update info of a current viewing article.
 const updateHandler = function (e: Event) {
   const detail = (e as CustomEvent).detail;
   const article = detail.getArticle();
   const state: { full: string; value: string; sel: boolean }[] = [];
   let additionalState = '';
 
+  // Load more reasons panel.
+  // The typical reason buttons are rendered before the free editing area.
+  // The free editing area contains additional inputs for each reason buttons
+  // and the preview of result.
   const reasonsEl = $('#app .main-container .l-card:last-child');
   if (reasonsEl.length === 0) {
     return;
   }
+  // Remove the original reason buttons of luogu.
   reasonsEl.children('p').remove();
   reasonsEl.children('br').remove();
   reasonsEl.children('textarea').remove();
+  // The submit button element.
   const submitEl = reasonsEl.children('button:last-child');
   const freeEditingArea = $('<div data-v-17227e28></div>');
   submitEl.before(freeEditingArea);
 
+  // When click on a button, or change the value of an input.
   const changingReasonsHandler = function () {
+    // Reasons list.
     const result: string[] = [];
     for (const item of state) {
       if (!item.sel) {
         continue;
       }
+      // If additional reasons are provided, render them, otherwise ignore them.
       result.push(item.full + (item.value === '' ? '' : `（${item.value}）`));
     }
     if (additionalState !== '') {
@@ -121,7 +117,9 @@ const updateHandler = function (e: Event) {
     }
 
     if (result.length !== 0) {
-      if (Storage.showAdminName) {
+      // At least one reasons are loaded.
+      // Set review result to false.
+      if (storage.showAdminName) {
         result.push(
           `审核管理员；${getAdminName()}，对审核结果有异议请私信交流。`
         );
@@ -130,18 +128,23 @@ const updateHandler = function (e: Event) {
       detail.setReviewResult(false, reason);
       freeEditingPreview.val(reason);
     } else {
+      // Set review result to true.
       detail.setReviewResult(true);
       freeEditingPreview.val('');
     }
   };
 
   freeEditingArea.append('<br/>');
+  // Render the typical reason buttons.
   for (const list of reasonsList) {
+    // The title of each sections.
     freeEditingArea.before(`<p>${list.title}</p>`);
     for (const reason of list.list) {
       state.push({
         full: reason.full,
+        // Additional reasons provided.
         value: '',
+        // If this reason is selected.
         sel: false,
       });
 
@@ -164,6 +167,7 @@ const updateHandler = function (e: Event) {
 
       const currentIndex = state.length - 1;
       const reasonButtonHandler = function () {
+        // (De-)Select a reason.
         freeEditingButtonEl.toggle();
         freeEditingInputEl.toggle();
         freeEditingBr.toggle();
@@ -183,8 +187,9 @@ const updateHandler = function (e: Event) {
   }
   freeEditingArea.append('<br/>');
 
+  // Control if the admin name is displayed in the result.
   const adminNameEl = $(
-    `<input type="checkbox" ${Storage.showAdminName ? 'checked' : ''}/>`
+    `<input type="checkbox" ${storage.showAdminName ? 'checked' : ''}/>`
   );
   freeEditingArea.before(
     '<br/><br/>',
@@ -192,11 +197,12 @@ const updateHandler = function (e: Event) {
     '<span>&nbsp;显示审核管理员</span>'
   );
   adminNameEl.on('change', () => {
-    Storage.showAdminName = !Storage.showAdminName;
-    setHistory(Storage);
+    storage.showAdminName = !storage.showAdminName;
+    setHistory(storage);
     changingReasonsHandler();
   });
 
+  // Other additional reasons provided.
   const freeEditingTextarea = $(
     '<textarea data-v-33028704 data-v-17227e28 placeholder="其他理由"/>'
   );
@@ -206,19 +212,22 @@ const updateHandler = function (e: Event) {
     changingReasonsHandler();
   });
 
+  // The preview of the result.
   const freeEditingPreview = $(
     '<textarea data-v-33028704 data-v-17227e28 placeholder="预览理由" disabled/>'
   );
   freeEditingArea.append(freeEditingPreview);
 
   submitEl.one('click', () => {
+    // Submit the review result.
     const accepted = detail.getReviewResult().accept;
     if (accepted) {
-      Storage.accept += 1;
+      storage.accept += 1;
     } else {
-      Storage.decline += 1;
+      storage.decline += 1;
     }
 
+    // Add a reviewing history.
     const newItem: Review = {
       id: article.lid,
       author: article.author.uid,
@@ -226,9 +235,9 @@ const updateHandler = function (e: Event) {
       accepted,
       time: new Date(),
     };
-    Storage.data.push(newItem);
+    storage.data.push(newItem);
 
-    setHistory(Storage);
+    setHistory(storage);
     updateViewHandler();
   });
 
@@ -245,6 +254,35 @@ const updateHandler = function (e: Event) {
       () => window.alert('操作成功。')
     );
   });
+};
+
+const settingsHandler = function () {
+  const newLink = window.prompt(
+    '配置放置打回理由的云剪贴板（是否公开均可，注意更改剪贴板内容后需要刷新生效）：',
+    storage.reasons
+  );
+
+  if (newLink === null || newLink === '') {
+    return;
+  }
+  storage.reasons = newLink;
+  setHistory(storage);
+  window.alert('操作完成。');
+  window.location.reload();
+};
+
+const historyHandler = function () {
+  $('#problem-admin-history').toggle();
+};
+
+const clearHandler = function () {
+  if (
+    window.confirm('确实要清除历史记录吗？\n所有数据将无法恢复！') &&
+    window.confirm('第二次确认，确实要清除历史记录吗？')
+  ) {
+    removeHistory();
+    window.alert('操作完成。');
+  }
 };
 
 // Load function.
