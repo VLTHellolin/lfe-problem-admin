@@ -51,11 +51,28 @@ const clearHandler = function () {
 };
 
 const updateViewHandler = function () {
+  let weekAccept = 0,
+    weekDecline = 0;
+  const weekStart = new Date();
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1);
+  weekStart.setHours(0, 0, 0, 0);
+  for (let i = Storage.data.length - 1; i >= 0; i -= 1) {
+    const current = Storage.data[i];
+    if (current.time < weekStart) {
+      break;
+    }
+    if (current.accepted) {
+      weekAccept += 1;
+    } else {
+      weekDecline += 1;
+    }
+  }
+
   $('#problem-admin-history-total').text(
     `${Storage.accept + Storage.decline} / ${Storage.accept} / ${Storage.decline}`
   );
   $('#problem-admin-history-week').text(
-    `${Storage.accept + Storage.decline} / ${Storage.accept} / ${Storage.decline}`
+    `${weekAccept + weekDecline} / ${weekAccept} / ${weekDecline}`
   );
 
   let listHTML = '<ul>';
@@ -63,7 +80,7 @@ const updateViewHandler = function () {
   for (let i = Storage.data.length - 1; i >= 0; i -= 1) {
     const current = Storage.data[i];
     listHTML += `<li>
-    <a href="https://www.luogu.com.cn/article/${current.id}/edit">U${current.author} 作为 ${current.pid} 的题解</a>，${current.accepted ? '通过' : '打回'}，${current.time}
+    <a href="https://www.luogu.com.cn/article/${current.id}/edit">U${current.author} 作为 ${current.pid} 的题解</a>，${current.accepted ? '通过' : '打回'}，${current.time.toLocaleString('zh-CN')}
     </li>`;
     counter += 1;
     if (counter === 50) {
@@ -206,7 +223,7 @@ const updateHandler = function (e: Event) {
       author: article.author.uid,
       pid: article.solutionFor.pid,
       accepted,
-      time: new Date().toLocaleString('zh-CN'),
+      time: new Date(),
     };
     Storage.data.push(newItem);
 
