@@ -9,6 +9,8 @@ import {
 } from '../lib';
 
 const storage = getHistory();
+let historyShowState = false;
+let historyChangedState = false;
 
 // Get reasons list from luogu clipboard.
 const reasonsClipboard = await $.ajax(storage.reasons, {
@@ -218,6 +220,20 @@ const updateHandler = function (e: Event) {
   );
   freeEditingArea.append(freeEditingPreview);
 
+  $(
+    '#app .main-container .l-card.burger .body div:first-child blockquote'
+  ).after(
+    '<div data-v-4842157a><a data-v-bade3303 data-v-4842157a id="problem-admin-close">关闭本题题解通道</a></div>'
+  );
+  $('#problem-admin-close').on('click', () => {
+    updateProblem(
+      { acceptSolution: false },
+      article.solutionFor.pid,
+      () => window.alert('操作失败。'),
+      () => window.alert('操作成功。')
+    );
+  });
+
   submitEl.one('click', () => {
     // Submit the review result.
     const accepted = detail.getReviewResult().accept;
@@ -238,21 +254,12 @@ const updateHandler = function (e: Event) {
     storage.data.push(newItem);
 
     setHistory(storage);
-    updateViewHandler();
-  });
-
-  $(
-    '#app .main-container .l-card.burger .body div:first-child blockquote'
-  ).after(
-    '<div data-v-4842157a><a data-v-bade3303 data-v-4842157a id="problem-admin-close">关闭本题题解通道</a></div>'
-  );
-  $('#problem-admin-close').on('click', () => {
-    updateProblem(
-      { acceptSolution: false },
-      article.solutionFor.pid,
-      () => window.alert('操作失败。'),
-      () => window.alert('操作成功。')
-    );
+    // If the history view is not opened, it's not necessary to update the list.
+    if (historyShowState) {
+      updateViewHandler();
+    } else {
+      historyChangedState = true;
+    }
   });
 };
 
@@ -272,6 +279,10 @@ const settingsHandler = function () {
 };
 
 const historyHandler = function () {
+  historyShowState = !historyShowState;
+  if (historyChangedState) {
+    updateViewHandler();
+  }
   $('#problem-admin-history').toggle();
 };
 
