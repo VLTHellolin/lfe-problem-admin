@@ -37,7 +37,7 @@ export interface Review {
   author: number;
   pid: string;
   accepted: boolean;
-  time: Date;
+  time: string;
 }
 export interface ReviewHistory {
   reasons: string;

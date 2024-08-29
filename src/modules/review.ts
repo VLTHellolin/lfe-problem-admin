@@ -35,7 +35,7 @@ const renderHistoryCount = function () {
   weekStart.setHours(0, 0, 0, 0);
   for (let i = storage.data.length - 1; i >= 0; i -= 1) {
     const current = storage.data[i];
-    if (current.time < weekStart) {
+    if (new Date(current.time) < weekStart) {
       break;
     }
     if (current.accepted) {
@@ -61,7 +61,7 @@ const renderHistoryList = function () {
   for (let i = storage.data.length - 1; i >= 0; i -= 1) {
     const current = storage.data[i];
     listHTML += `<li>
-    <a href="https://www.luogu.com.cn/article/${current.id}/edit">U${current.author} 作为 ${current.pid} 的题解</a>，${current.accepted ? '通过' : '打回'}，${current.time.toLocaleString('zh-CN')}
+    <a href="https://www.luogu.com.cn/article/${current.id}/edit">U${current.author} 作为 ${current.pid} 的题解</a>，${current.accepted ? '通过' : '打回'}，${current.time}
     </li>`;
     counter += 1;
     if (counter === 50) {
@@ -233,7 +233,7 @@ const updateHandler = function (e: Event) {
       author: article.author.uid,
       pid: article.solutionFor.pid,
       accepted,
-      time: new Date(),
+      time: new Date().toLocaleString('zh-CN'),
     };
     storage.data.push(newItem);
 
