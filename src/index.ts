@@ -10,7 +10,9 @@ declare global {
 import modules from './modules';
 
 for (const mod of modules) {
-  $(mod.load);
+  if (mod.condition()) {
+    $(mod.load);
+  }
 }
 
 const ob = new MutationObserver((records) => {
@@ -20,7 +22,11 @@ const ob = new MutationObserver((records) => {
 
     nodes.forEach((node) => {
       for (const mod of modules) {
-        if (mod.obCondition && mod.obCondition(node as Element)) {
+        if (
+          mod.condition() &&
+          mod.obCondition &&
+          mod.obCondition(node as Element)
+        ) {
           mod.load();
         }
       }
