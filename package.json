@@ -1,6 +1,6 @@
 {
   "name": "lfe-problem-admin",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Problem admin panel for lfe",
   "main": "index.js",
   "type": "module",
