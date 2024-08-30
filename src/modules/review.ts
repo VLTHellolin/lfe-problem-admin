@@ -5,7 +5,6 @@ import {
   getHistory,
   removeHistory,
   setHistory,
-  updateProblem,
 } from '../lib';
 
 const storage = getHistory();
@@ -90,7 +89,7 @@ const updateHandler = function (e: Event) {
   // The typical reason buttons are rendered before the free editing area.
   // The free editing area contains additional inputs for each reason buttons
   // and the preview of result.
-  const reasonsEl = $('#app .main-container .l-card:last-child');
+  const reasonsEl = $('#app .main-container .main .l-card:last-child');
   if (reasonsEl.length === 0) {
     return;
   }
@@ -98,9 +97,12 @@ const updateHandler = function (e: Event) {
   reasonsEl.children('p').remove();
   reasonsEl.children('br').remove();
   reasonsEl.children('textarea').remove();
+  reasonsEl.children('.review-header:first-child').remove();
   // The submit button element.
-  const submitEl = reasonsEl.children('button:last-child');
+  // const submitEl = reasonsEl.children('.review-header button:last-child');
+  const submitEl = reasonsEl.children('.review-header');
   const freeEditingArea = $('<div data-v-17227e28></div>');
+  submitEl.children('div:first-child').remove();
   submitEl.before(freeEditingArea);
 
   // When click on a button, or change the value of an input.
@@ -155,7 +157,7 @@ const updateHandler = function (e: Event) {
       );
       freeEditingArea.before(reasonEl, '&nbsp;');
       const freeEditingButtonEl = $(
-        `<button data-v-f21de448 data-v-17227e28 type="button" class="problem-admin-reasons" title="${reason.full}" style="display: none;">${reason.short}</button>&nbsp;`
+        `<button data-v-f21de448 data-v-17227e28 type="button" class="problem-admin-reasons" title="${reason.full}" style="display: none;">${reason.short}</button>`
       );
       const freeEditingInputEl = $(
         '<input class="problem-admin-reasons-input" placeholder="追加原因" style="display: none;"/>'
@@ -219,20 +221,6 @@ const updateHandler = function (e: Event) {
     '<textarea data-v-33028704 data-v-17227e28 placeholder="预览理由" disabled/>'
   );
   freeEditingArea.append(freeEditingPreview);
-
-  $(
-    '#app .main-container .l-card.burger .body div:first-child blockquote'
-  ).after(
-    '<div data-v-4842157a><a data-v-bade3303 data-v-4842157a id="problem-admin-close">关闭本题题解通道</a></div>'
-  );
-  $('#problem-admin-close').on('click', () => {
-    updateProblem(
-      { acceptSolution: false },
-      article.solutionFor.pid,
-      () => window.alert('操作失败。'),
-      () => window.alert('操作成功。')
-    );
-  });
 
   submitEl.one('click', () => {
     // Submit the review result.
@@ -354,9 +342,11 @@ const load = function () {
 .problem-admin-reasons {
   font-size: .875em;
   padding: .325em .9em;
+  margin-right: .1em;
+  margin-bottom: .25em;
 }
 </style>`;
-  $('#app .main-container .breadcrumb').after(infoHTML);
+  $('#app .main-container .container .article-review').prepend(infoHTML);
   // Add event listeners.
   $('#problem-admin-settings-btn').on('click', settingsHandler);
   $('#problem-admin-history-btn').on('click', historyHandler);
