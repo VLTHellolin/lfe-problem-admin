@@ -125,7 +125,7 @@ const updateHandler = function (e: Event) {
       // Set review result to false.
       if (storage.showAdminName) {
         result.push(
-          `审核管理员；${getAdminName()}，对审核结果有异议请私信交流。`
+          `审核管理员：${getAdminName()}，对审核结果有异议请私信交流。`
         );
       }
       const reason = result.join('；');
