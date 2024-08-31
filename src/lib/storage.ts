@@ -6,8 +6,6 @@ export const getHistory = function () {
   const result = localStorage.getItem(Name);
   if (result === null) {
     const newItem: ReviewHistory = {
-      reasons: 'https://www.luogu.com.cn/paste/pel0tgzp',
-      showAdminName: true,
       accept: 0,
       decline: 0,
       data: [],

@@ -40,17 +40,10 @@ export interface Review {
   time: string;
 }
 export interface ReviewHistory {
-  reasons: string;
-  showAdminName: boolean;
   accept: number;
   decline: number;
   data: Review[];
 }
-export interface ReasonsSection {
-  title: string;
-  list: { short: string; full: string }[];
-}
-export type ReasonsList = ReasonsSection[];
 export interface ModuleExports {
   name?: string;
   load: () => void | Promise<void>;
