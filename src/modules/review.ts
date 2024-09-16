@@ -7,14 +7,18 @@ import {
 
 // Since 1.3.0, localForage is used instead of localStorage.
 // This is a function that transfers data.
-const transferData = function () {
+const transferData = async function () {
   const oldDataStr = localStorage.getItem('problem-admin-history');
   if (oldDataStr === null) return;
   const oldData = JSON.parse(oldDataStr) as ReviewHistory;
   if (oldData.transferred) return;
 
+  oldData.transferred = true;
+  localStorage.setItem('problem-admin-history', JSON.stringify(oldData));
+
   db.storage.setItem('history', oldData.data);
   db.reconstruct();
+  await db.ready;
 };
 
 let historyShowState = false;
@@ -92,7 +96,7 @@ const clearHandler = function () {
 // Load function.
 const load = async function () {
   await db.ready;
-  transferData();
+  await transferData();
 
   const btnHTML = `<div data-v-2360723b>
 <button data-v-f21de448 data-v-7b38dc8c type="button"

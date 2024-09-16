@@ -1,5 +1,5 @@
 import { type FeInjection, type FeInstance } from './lib/types';
-import 'jquery';
+import $ from 'jquery';
 
 declare global {
   const _feInjection: FeInjection;

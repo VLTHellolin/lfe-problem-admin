@@ -18,10 +18,11 @@ export class AppDB {
     const weekDay = date.getDay();
     date.setDate(date.getDate() - (weekDay === 0 ? 6 : weekDay - 1));
     date.setHours(0, 0, 0, 0);
-    this.weekStart = date;
+    this.weekStart = new Date(date);
     date.setDate(date.getDate() + 7);
-    this.weekEnd = date;
+    this.weekEnd = new Date(date);
 
+    console.log(this.weekStart, this.weekEnd);
     this.weekAcceptedCount = this.weekRefusedCount = 0;
     for (let i = this.history.length - 1; i >= 0; --i) {
       const current = this.history[i];
@@ -38,6 +39,7 @@ export class AppDB {
     await this.storage.ready();
     this.history = (await this.storage.getItem('history')) ?? [];
 
+    this.acceptedCount = this.refusedCount = 0;
     for (const current of this.history) {
       if (current.accepted) {
         ++this.acceptedCount;
