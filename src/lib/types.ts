@@ -40,6 +40,8 @@ export interface Review {
   time: string;
 }
 export interface ReviewHistory {
+  // Old format
+  transferred?: boolean;
   accept: number;
   decline: number;
   data: Review[];

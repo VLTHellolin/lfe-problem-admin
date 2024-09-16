@@ -1,68 +1,49 @@
 import {
   type Review,
   type ModuleExports,
-  getHistory,
-  removeHistory,
-  setHistory,
+  type ReviewHistory,
+  db,
 } from '../lib';
 
-const storage = getHistory();
+// Since 1.3.0, localForage is used instead of localStorage.
+// This is a function that transfers data.
+const transferData = function () {
+  const oldDataStr = localStorage.getItem('problem-admin-history');
+  if (oldDataStr === null) return;
+  const oldData = JSON.parse(oldDataStr) as ReviewHistory;
+  if (oldData.transferred) return;
+
+  db.storage.setItem('history', oldData.data);
+  db.reconstruct();
+};
+
 let historyShowState = false;
 let historyChangedState = false;
 
-// Render the total and weekly count in the history view.
-const renderHistoryCount = function () {
-  let weekAccept = 0,
-    weekDecline = 0;
-  const weekStart = new Date();
-  const weekDay = weekStart.getDay();
-  weekStart.setDate(weekStart.getDate() - (weekDay === 0 ? 6 : weekDay - 1));
-  weekStart.setHours(0, 0, 0, 0);
-  for (let i = storage.data.length - 1; i >= 0; i -= 1) {
-    const current = storage.data[i];
-    if (new Date(current.time) < weekStart) {
-      break;
-    }
-    if (current.accepted) {
-      weekAccept += 1;
-    } else {
-      weekDecline += 1;
-    }
-  }
-
+const updateViewHandler = function () {
+  // Render total review count and this week review count.
   $('#problem-admin-history-total').text(
-    `${storage.accept + storage.decline} / ${storage.accept} / ${storage.decline}`
+    `${db.history.length} / ${db.acceptedCount} / ${db.refusedCount}`
   );
   $('#problem-admin-history-week').text(
-    `${weekAccept + weekDecline} / ${weekAccept} / ${weekDecline}`
+    `${db.weekAcceptedCount + db.weekRefusedCount} / ${db.weekAcceptedCount} / ${db.weekRefusedCount}`
   );
-};
 
-// Render a list of articles in the history view.
-// Will show up to 50 recent articles.
-const renderHistoryList = function () {
+  // Render each review detail, up to 50.
   let listHTML = '<ul>';
   let counter = 0;
-  for (let i = storage.data.length - 1; i >= 0; i -= 1) {
-    const current = storage.data[i];
+  for (let i = db.history.length - 1; i >= 0; --i) {
+    const current = db.history[i];
     listHTML += `<li>
     <a href="https://www.luogu.com.cn/article/${current.id}/edit">U${current.author} 作为 ${current.pid} 的题解</a>，${current.accepted ? '通过' : '打回'}，${current.time}
     </li>`;
-    counter += 1;
-    if (counter === 50) {
-      break;
-    }
+    ++counter;
+    if (counter === 50) break;
   }
   listHTML += '</ul>';
   $('#problem-admin-list').html(listHTML);
 };
 
-const updateViewHandler = function () {
-  renderHistoryCount();
-  renderHistoryList();
-};
-
-// Update info of a current viewing article.
 const updateHandler = function (e: Event) {
   const detail = (e as CustomEvent).detail;
   const article = detail.getArticle();
@@ -70,15 +51,7 @@ const updateHandler = function (e: Event) {
   $(
     '#app .main-container .main .l-card:last-child .review-header:last-child button'
   ).one('click', () => {
-    // Submit the review result.
     const accepted = detail.getReviewResult().accept;
-    if (accepted) {
-      storage.accept += 1;
-    } else {
-      storage.decline += 1;
-    }
-
-    // Add a reviewing history.
     const newItem: Review = {
       id: article.lid,
       author: article.author.uid,
@@ -86,9 +59,8 @@ const updateHandler = function (e: Event) {
       accepted,
       time: new Date().toLocaleString('zh-CN'),
     };
-    storage.data.push(newItem);
+    db.put(newItem);
 
-    setHistory(storage);
     // If the history view is not opened, it's not necessary to update the list.
     if (historyShowState) {
       updateViewHandler();
@@ -101,9 +73,7 @@ const updateHandler = function (e: Event) {
 
 const historyHandler = function () {
   historyShowState = !historyShowState;
-  if (historyChangedState) {
-    updateViewHandler();
-  }
+  if (historyChangedState) updateViewHandler();
   historyChangedState = false;
   $('#problem-admin-history').toggle();
 };
@@ -113,14 +83,17 @@ const clearHandler = function () {
     window.confirm('确实要清除历史记录吗？\n所有数据将无法恢复！') &&
     window.confirm('第二次确认，确实要清除历史记录吗？')
   ) {
-    removeHistory();
+    db.storage.dropInstance();
     window.alert('操作完成。');
     window.location.reload();
   }
 };
 
 // Load function.
-const load = function () {
+const load = async function () {
+  await db.ready;
+  transferData();
+
   const btnHTML = `<div data-v-2360723b>
 <button data-v-f21de448 data-v-7b38dc8c type="button"
   id="problem-admin-history-btn" class="solid lform-size-middle">历史记录</button>\
@@ -146,7 +119,7 @@ body {
     本周审核数量 / 通过 / 拒绝：<span id="problem-admin-history-week">null</spaan>
   </div>
   <div data-v-7b38dc8c>
-    只显示最近五十条记录，其他的可以通过本地存储查看。越新审核的越靠前。
+    只显示最近五十条记录，其他的可以通过 IndexedDB 查看。越新审核的越靠前。
     <br/>
     <div data-v-7b38dc8c id="problem-admin-list">
       null

@@ -13,6 +13,8 @@ export default monkey({
   },
   externals: {
     jquery: 'https://cdn.hellolin.top/npm/jquery@3.7.1/dist/jquery.min.js',
+    localforage:
+      'https://cdn.hellolin.top/npm/localforage@1.10.0/dist/localforage.min.js',
   },
   resolve: {
     extensions: ['.ts', '.json', '...'],
