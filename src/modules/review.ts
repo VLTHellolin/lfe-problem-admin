@@ -15,7 +15,8 @@ const renderHistoryCount = function () {
   let weekAccept = 0,
     weekDecline = 0;
   const weekStart = new Date();
-  weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1);
+  const weekDay = weekStart.getDay();
+  weekStart.setDate(weekStart.getDate() - (weekDay === 0 ? 6 : weekDay - 1));
   weekStart.setHours(0, 0, 0, 0);
   for (let i = storage.data.length - 1; i >= 0; i -= 1) {
     const current = storage.data[i];
