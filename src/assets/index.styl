@@ -1,0 +1,118 @@
+.pa-button
+  display inline-block
+  outline 0
+  cursor pointer
+  line-height 1.5
+  border-radius 3px
+  margin-right .5em
+  &:hover
+    opacity .85
+  &.pa-primary
+    border-color rgb(52, 152, 219) !important
+    background-color rgb(52, 152, 219) !important
+    border 1px solid
+  &.pa-secondary
+    border-color rgba(255, 255, 255, 0.5) !important
+    background-color rgba(0, 0, 0, 0.5) !important
+    color rgb(255, 255, 255) !important
+    border 2px solid
+
+.pa-dropdown
+  position absolute
+  pointer-events none
+  opacity 0
+  transition all .15s ease-in-out
+  background #fff
+  color #333
+  box-shadow 0 1px 3px rgba(26, 26, 26, .3)
+  font-size 1rem
+  width max-content
+  min-width 200px
+  padding .6em .8em
+  &.shown
+    pointer-events unset
+    opacity 1
+    z-index 9
+
+.pa-modal
+  display block
+  position fixed
+  top 0
+  bottom 0
+  left 0
+  right 0
+  overflow auto
+  z-index 114514
+  transition .3s ease all
+  pointer-events none
+  opacity 0
+  &.shown
+    pointer-events unset
+    opacity 1
+  .pa-modal-background
+    position absolute
+    top 0
+    bottom 0
+    left 0
+    right 0
+    background rgba(0, 0, 0, .5)
+  .pa-modal-outer-container
+    position absolute
+    transform translate(-50%, -50%)
+    top 50%
+    left 50%
+    overflow-y auto
+    max-width 100%
+    max-height 90vh
+    width 700px
+    padding 1.2em
+    margin-bottom 1.2em
+    background #fff
+    color #000
+    border-radius 4px
+    box-shadow 0 1px 3px rgba(26, 26, 26, .1)
+    box-sizing border-box
+    ^[0].long ^[1..1]
+      height 600px
+    .pa-modal-inner-container
+      display flex
+      flex-flow column
+      height 100%
+      align-items stretch
+      & > *
+        flex 0 0 auto
+      .pa-modal-main
+        margin-top 10px
+        flex 1 1 auto
+        overflow-y auto
+        select
+          padding .3em .6em
+      .pa-modal-actions > button
+        float right
+
+.pa-tags
+  .pa-tag-section
+    border-bottom 1px solid #e8e8e8
+    padding-bottom 1.5em
+    display none
+    &.shown
+      display block
+    .pa-tag-title
+      color rgba(0, 0, 0, .85)
+      margin 1.2em 0
+    .pa-tag
+      margin-right .8em
+      margin-bottom .8em
+      cursor pointer
+      display none
+      padding 0 8px
+      box-sizing border-box
+      border-radius 2px
+      font-weight 400
+      background rgb(232, 232, 232)
+      border 1px solid rgb(191, 191, 191)
+      &.selected
+        background #2949b4
+        border 1px solid #223e99
+      &.shown
+        display inline-block
