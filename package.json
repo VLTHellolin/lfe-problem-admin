@@ -9,8 +9,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "check": "bunx biome check --write ."
+    "check": "pnpx biome check --write ."
   },
+  "packageManager": "pnpm@7.0.0+",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/react": "^18.3.12",
