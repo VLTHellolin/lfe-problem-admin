@@ -23,7 +23,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
             <h3 className='pa-modal-header lfe-h3'>{header}</h3>
             <div className='pa-modal-main'>{children}</div>
             <div className='pa-modal-actions'>
-              <LegacyButton primary onClick={() => onSuccess?.()}>
+              <LegacyButton theme='primary' onClick={() => onSuccess?.()}>
                 确认
               </LegacyButton>
               {onCancel && <LegacyButton onClick={() => onCancel()}>取消</LegacyButton>}

@@ -7,3 +7,4 @@ declare global {
 
 import './assets/index.styl';
 import './modules/problem';
+import './modules/review';

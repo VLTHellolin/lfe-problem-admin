@@ -10,6 +10,7 @@ import { LegacyButton } from '../components/LegacyButton';
 import { LegacyDropdown } from '../components/LegacyDropdown';
 import { Modal } from '../components/Modal';
 import { TagsSelection } from '../components/TagsSelection';
+import { GM_getValue, GM_setValue, GM_registerMenuCommand } from '$';
 
 const Panel = () => {
   const tagsDB = new DB('lfeData');
@@ -106,16 +107,18 @@ const Panel = () => {
   return (
     <>
       <span>
-        <LegacyButton onClick={() => setDropdownShown(!dropdownShown)}>管理题目</LegacyButton>
+        <LegacyButton theme='dark' onClick={() => setDropdownShown(!dropdownShown)}>
+          管理题目
+        </LegacyButton>
         {dropdownShown && (
           <LegacyDropdown>
-            <LegacyButton primary onClick={() => setModalShown(1)}>
+            <LegacyButton theme='primary' onClick={() => setModalShown(1)}>
               题解通道
             </LegacyButton>
-            <LegacyButton primary onClick={() => setModalShown(2)}>
+            <LegacyButton theme='primary' onClick={() => setModalShown(2)}>
               题目难度
             </LegacyButton>
-            <LegacyButton primary onClick={() => setModalShown(3)}>
+            <LegacyButton theme='primary' onClick={() => setModalShown(3)}>
               题目标签
             </LegacyButton>
           </LegacyDropdown>
@@ -152,13 +155,22 @@ const hooker = {
   callback: (nodes: Element[]) => {
     const rootElement = document.createElement('div');
     nodes[0].appendChild(rootElement);
-    createRoot(rootElement).render(<Panel />);
     loaded = true;
+    createRoot(rootElement).render(<Panel />);
   },
   selector: '.header > .functional > .operation',
   active: () => !loaded,
 };
 
-if (matchUrl(['/problem']) && _feInjection.currentTemplate === 'ProblemShow') {
+if (
+  matchUrl(['/problem']) &&
+  _feInjection.currentTemplate === 'ProblemShow' &&
+  GM_getValue<boolean>('show-problem-panel', true)
+) {
   addHooker(hooker);
 }
+
+GM_registerMenuCommand('更改是否显示「管理题目」', () => {
+  GM_setValue('show-problem-panel', window.confirm('确认为显示，取消为不显示'));
+  window.location.reload();
+});

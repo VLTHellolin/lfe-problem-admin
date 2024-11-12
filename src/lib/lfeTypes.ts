@@ -1,5 +1,6 @@
 export interface FeInjection {
   currentTemplate: string;
+  currentUser: { isAdmin: boolean };
   // biome-ignore lint/suspicious/noExplicitAny:
   currentData: any;
 }

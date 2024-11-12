@@ -1,4 +1,4 @@
-import { openDB, type IDBPDatabase } from 'idb';
+import { openDB } from 'idb';
 
 export class DB {
   private dbPromise;
@@ -14,5 +14,8 @@ export class DB {
   }
   async del(key: string) {
     return (await this.dbPromise).delete('keyvaluepairs', key);
+  }
+  async clear() {
+    (await this.dbPromise).clear('keyvaluepairs');
   }
 }
