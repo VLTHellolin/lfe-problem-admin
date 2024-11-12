@@ -1,10 +1,10 @@
-import type { FeInjection, FeInstance } from './lib/lfeTypes';
+import type { FeInjection, FeInstance } from "./lib/lfeTypes";
 
 declare global {
   const _feInjection: FeInjection;
   const _feInstance: FeInstance;
 }
 
-import './assets/index.styl';
-import './modules/problem';
-import './modules/review';
+import "./assets/index.styl";
+import "./modules/problem";
+import "./modules/review";

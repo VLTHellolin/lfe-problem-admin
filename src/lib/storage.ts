@@ -1,4 +1,4 @@
-import { openDB } from 'idb';
+import { openDB } from "idb";
 
 export class DB {
   private dbPromise;
@@ -7,15 +7,15 @@ export class DB {
     this.dbPromise = openDB(name, version);
   }
   async get(key: string) {
-    return (await this.dbPromise).get('keyvaluepairs', key);
+    return (await this.dbPromise).get("keyvaluepairs", key);
   }
   async set(key: string, val: unknown) {
-    return (await this.dbPromise).put('keyvaluepairs', val, key);
+    return (await this.dbPromise).put("keyvaluepairs", val, key);
   }
   async del(key: string) {
-    return (await this.dbPromise).delete('keyvaluepairs', key);
+    return (await this.dbPromise).delete("keyvaluepairs", key);
   }
   async clear() {
-    (await this.dbPromise).clear('keyvaluepairs');
+    (await this.dbPromise).clear("keyvaluepairs");
   }
 }
