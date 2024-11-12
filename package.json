@@ -11,7 +11,6 @@
     "build": "vite build",
     "check": "pnpx biome check --write ."
   },
-  "packageManager": "pnpm@7.0.0+",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/react": "^18.3.12",
