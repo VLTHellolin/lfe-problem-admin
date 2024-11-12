@@ -11,9 +11,8 @@ import { LegacyDropdown } from '../components/LegacyDropdown';
 import { Modal } from '../components/Modal';
 import { TagsSelection } from '../components/TagsSelection';
 
-const tagsDB = new DB('lfeData');
-
 const Panel = () => {
+  const tagsDB = new DB('lfeData');
   const [dropdownShown, setDropdownShown] = useState(false);
   const [modalShown, setModalShown] = useState(0);
 
@@ -61,7 +60,7 @@ const Panel = () => {
         value={problemTags}
         onModify={e => {
           const index = problemTags.indexOf(e);
-          if (index === -1) problemTags.push(e);
+          if (index === -1) setProblemTags([...problemTags, e]);
           else setProblemTags(problemTags.filter(f => f !== e));
         }}
       />
@@ -108,39 +107,42 @@ const Panel = () => {
     <>
       <span>
         <LegacyButton onClick={() => setDropdownShown(!dropdownShown)}>管理题目</LegacyButton>
-        <LegacyDropdown shown={dropdownShown}>
-          <LegacyButton primary onClick={() => setModalShown(1)}>
-            题解通道
-          </LegacyButton>
-          <LegacyButton primary onClick={() => setModalShown(2)}>
-            题目难度
-          </LegacyButton>
-          <LegacyButton primary onClick={() => setModalShown(3)}>
-            题目标签
-          </LegacyButton>
-        </LegacyDropdown>
+        {dropdownShown && (
+          <LegacyDropdown>
+            <LegacyButton primary onClick={() => setModalShown(1)}>
+              题解通道
+            </LegacyButton>
+            <LegacyButton primary onClick={() => setModalShown(2)}>
+              题目难度
+            </LegacyButton>
+            <LegacyButton primary onClick={() => setModalShown(3)}>
+              题目标签
+            </LegacyButton>
+          </LegacyDropdown>
+        )}
       </span>
-      <Modal
-        header='题目管理'
-        shown={!!modalShown}
-        onSuccess={handleSuccess}
-        onCancel={() => setModalShown(0)}
-        long={modalShown === 3}
-      >
-        <div>
-          如果你要批量操作题目，在下面输入其他题目的 PID，空格分隔。
-          <input
-            type='text'
-            className='lfe-form-sz-small'
-            placeholder='P1001 P1002 ...'
-            onChange={e => setProblemUpdateList(e.target.value)}
-          />
-        </div>
-        <br />
-        {modalShown === 1 && ProblemSolution()}
-        {modalShown === 2 && ProblemDifficulty()}
-        {modalShown === 3 && ProblemTags()}
-      </Modal>
+      {modalShown !== 0 && (
+        <Modal
+          header='题目管理'
+          onSuccess={handleSuccess}
+          onCancel={() => setModalShown(0)}
+          long={modalShown === 3}
+        >
+          <div>
+            如果你要批量操作题目，在下面输入其他题目的 PID，空格分隔。
+            <input
+              type='text'
+              className='lfe-form-sz-small'
+              placeholder='P1001 P1002 ...'
+              onChange={e => setProblemUpdateList(e.target.value)}
+            />
+          </div>
+          <br />
+          {modalShown === 1 && ProblemSolution()}
+          {modalShown === 2 && ProblemDifficulty()}
+          {modalShown === 3 && ProblemTags()}
+        </Modal>
+      )}
     </>
   );
 };

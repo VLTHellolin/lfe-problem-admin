@@ -4,18 +4,17 @@ import { LegacyButton } from './LegacyButton';
 
 export interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   header?: string;
-  shown?: boolean;
   long?: boolean;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
 export const Modal = forwardRef<HTMLDivElement, ModalProps>(
-  ({ className, children, header, shown, long, onSuccess, onCancel, ...props }, ref) => {
+  ({ className, children, header, long, onSuccess, onCancel, ...props }, ref) => {
     return (
       <div
         ref={ref}
-        className={clsx('pa-modal', shown && 'shown', long && 'long', className)}
+        className={clsx('pa-modal', 'pa-fadein', long && 'long', className)}
         {...props}
       >
         <div className='pa-modal-background' />
@@ -27,7 +26,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
               <LegacyButton primary onClick={() => onSuccess?.()}>
                 确认
               </LegacyButton>
-              <LegacyButton onClick={() => onCancel?.()}>取消</LegacyButton>
+              {onCancel && <LegacyButton onClick={() => onCancel()}>取消</LegacyButton>}
             </div>
           </div>
         </div>

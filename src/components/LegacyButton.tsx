@@ -12,11 +12,7 @@ export const LegacyButton = forwardRef<HTMLButtonElement, LegacyButtonProps>(
       <button
         ref={ref}
         type='button'
-        className={clsx(
-          'pa-button lfe-form-sz-middle',
-          primary ? 'pa-primary' : 'pa-secondary',
-          className
-        )}
+        className={clsx('pa-button lfe-form-sz-middle', primary && 'pa-primary', className)}
         {...props}
       >
         {children}

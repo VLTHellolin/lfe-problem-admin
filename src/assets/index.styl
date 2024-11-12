@@ -5,23 +5,26 @@
   line-height 1.5
   border-radius 3px
   margin-right .5em
+  border-color rgba(255, 255, 255, 0.5) !important
+  background-color rgba(0, 0, 0, 0.5) !important
+  color rgb(255, 255, 255)
+  border 2px solid
   &:hover
     opacity .85
   &.pa-primary
     border-color rgb(52, 152, 219) !important
     background-color rgb(52, 152, 219) !important
     border 1px solid
-  &.pa-secondary
-    border-color rgba(255, 255, 255, 0.5) !important
-    background-color rgba(0, 0, 0, 0.5) !important
-    color rgb(255, 255, 255) !important
-    border 2px solid
+  &.pa-error
+    border-color #e74c3c !important
+    background-color #e74c3c !important
+    border 1px solid
+  &.pa-spacing
+    padding .3125em 1em !important
+    margin-right 1em !important
 
 .pa-dropdown
   position absolute
-  pointer-events none
-  opacity 0
-  transition all .15s ease-in-out
   background #fff
   color #333
   box-shadow 0 1px 3px rgba(26, 26, 26, .3)
@@ -29,10 +32,7 @@
   width max-content
   min-width 200px
   padding .6em .8em
-  &.shown
-    pointer-events unset
-    opacity 1
-    z-index 9
+  z-index 9
 
 .pa-modal
   display block
@@ -43,12 +43,7 @@
   right 0
   overflow auto
   z-index 114514
-  transition .3s ease all
-  pointer-events none
-  opacity 0
-  &.shown
-    pointer-events unset
-    opacity 1
+  line-height 1.4
   .pa-modal-background
     position absolute
     top 0
@@ -89,6 +84,16 @@
           padding .3em .6em
       .pa-modal-actions > button
         float right
+        font-size .875em
+        padding .3125em 1em
+
+@keyframes fadeIn
+  to
+    opacity 1
+
+.pa-fadein
+  opacity 0
+  animation fadeIn .2s forwards
 
 .pa-tags
   .pa-tag-section
@@ -105,10 +110,11 @@
       margin-bottom .8em
       cursor pointer
       display none
-      padding 0 8px
+      padding 1px 8px
       box-sizing border-box
       border-radius 2px
       font-weight 400
+      color #000000
       background rgb(232, 232, 232)
       border 1px solid rgb(191, 191, 191)
       &.selected
