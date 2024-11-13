@@ -155,6 +155,7 @@ const hooker = {
   callback: (nodes: Element[]) => {
     const rootElement = document.createElement('div');
     nodes[0].appendChild(rootElement);
+    rootElement.id = 'pa-problem-panel';
     loaded = true;
     createRoot(rootElement).render(<Panel />);
   },

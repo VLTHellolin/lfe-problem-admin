@@ -28,6 +28,7 @@ export const TagsSelection = ({
           onChange={e => setFilter(e.target.value)}
         />
       </div>
+
       {tags.map(e => (
         <div
           key={e.name}
@@ -37,7 +38,7 @@ export const TagsSelection = ({
           )}
         >
           <div className='pa-tag-title'>{e.name}</div>
-          <div className={'pa-tag-list'}>
+          <div className='pa-tag-list'>
             {e.children.map(f => (
               <button
                 key={f.id}
