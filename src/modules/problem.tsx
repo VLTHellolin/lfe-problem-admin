@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { addHooker, matchUrl } from '../lib/utils';
 import { problemDifficultyMapToOld, problemDifficultyName } from '../lib/difficulty';
@@ -51,9 +51,12 @@ const Panel = () => {
 
   const [problemTags, setProblemTags] = useState(_feInjection.currentData.problem.tags as number[]);
   const [tagList, setTagList] = useState([] as TagSection[]);
-  tagsDB.get('luoguTags').then(e => {
-    setTagList(getFormattedTags(e));
-  });
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run after the initial render.
+  useEffect(() => {
+    tagsDB.get('luoguTags').then(e => {
+      setTagList(getFormattedTags(e));
+    });
+  }, []);
   const ProblemTags = () => {
     return (
       <TagsSelection
@@ -79,7 +82,6 @@ const Panel = () => {
     } else if (modalShown === 3) {
       result.tags = problemTags;
     }
-    console.log(result);
 
     const list = problemUpdateList.split(' ').concat([_feInjection.currentData.problem.pid]);
     const promiseList = list.map(e => csPost(`/sadmin/api/problem/partialUpdate/${e}`, result));
