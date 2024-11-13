@@ -165,5 +165,6 @@ const hooker = {
 };
 
 if (matchUrl(['/sadmin/article/review'])) {
+  document.body.style.overflowY = 'hidden';
   addHooker(hooker);
 }
