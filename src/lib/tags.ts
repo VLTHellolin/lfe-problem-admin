@@ -3,8 +3,8 @@ export interface Tag {
   name: string;
   type: 'Algorithm' | 'Origin' | 'Time' | 'Region' | 'SpecialProblem' | 'Others';
   parent: number | null;
-  color: string;
-  hasChildren: boolean;
+  color?: string;
+  hasChildren?: boolean;
 }
 export interface TagSection {
   id: number;
@@ -16,14 +16,25 @@ export interface TagSection {
 // This function preprocesses all secondary category names.
 export const getFormattedTags = (tags: Record<number, Tag>) => {
   const result: TagSection[] = [];
-  result.push({ id: -2, name: '语言入门（请选择 [入门与面试] 题库）', children: [] });
+  result.push({
+    id: -2,
+    name: '语言入门（请选择 [入门与面试] 题库）',
+    children: [
+      {
+        id: -2,
+        name: '语言入门（请选择 [入门与面试] 题库）',
+        type: 'Algorithm',
+        parent: null,
+      },
+    ],
+  });
   for (const tag of Object.values(tags)) {
     if (
       (tag.type === 'Algorithm' || tag.type === 'Origin') &&
       tag.id !== -2 &&
       tag.parent === null
     ) {
-      result.push({ id: tag.id, name: tag.name, children: [] });
+      result.push({ id: tag.id, name: tag.name, children: [tag] });
     }
   }
   result.push({ id: -10, name: '时间', children: [] });
@@ -32,11 +43,18 @@ export const getFormattedTags = (tags: Record<number, Tag>) => {
   result.push({ id: -13, name: '不可用标签', children: [] });
 
   const getSectionId = (e: Tag) => {
-    const result = -10 - ['Time', 'Region', 'SpecialProblem', 'Others'].indexOf(e.type);
-    return result === -9 ? (e.parent ?? -13) : result;
+    const unlistedSectionId = ['Time', 'Region', 'SpecialProblem', 'Others'].indexOf(e.type);
+    if (unlistedSectionId !== -1) return -10 - unlistedSectionId;
+    return e.parent ?? -13;
   };
 
   for (const tag of Object.values(tags)) {
+    if (
+      (tag.type === 'Algorithm' || tag.type === 'Origin') &&
+      tag.parent === null &&
+      tag.hasChildren
+    )
+      continue;
     result.find(e => e.id === getSectionId(tag))?.children.push(tag);
   }
   return result;
