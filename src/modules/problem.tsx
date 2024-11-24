@@ -31,21 +31,33 @@ const Panel = () => {
     );
   };
 
-  const [problemDifficulty, setProblemDifficulty] = useState(
-    problemDifficultyMapToOld(_feInjection.currentData.problem.difficulty)
-  );
+  const originalProblemDifficulty = _feInjection.currentData.problem.difficulty as number;
+  const [problemDifficulty, setProblemDifficulty] = useState(originalProblemDifficulty);
+  const isDeltaTooSmall = () =>
+    originalProblemDifficulty !== 0 &&
+    problemDifficulty !== 0 &&
+    Math.abs(originalProblemDifficulty - problemDifficulty) === 1;
   const ProblemDifficulty = () => {
     return (
-      <select
-        value={problemDifficulty}
-        onChange={e => setProblemDifficulty(Number.parseInt(e.target.value))}
-      >
-        {problemDifficultyName.map((e, i) => (
-          <option key={e} value={problemDifficultyMapToOld(i)}>
-            {e}
-          </option>
-        ))}
-      </select>
+      <>
+        <select
+          value={problemDifficulty}
+          onChange={e => setProblemDifficulty(Number.parseInt(e.target.value))}
+        >
+          {problemDifficultyName.map((e, i) => (
+            <option key={e} value={i}>
+              {e}
+            </option>
+          ))}
+        </select>
+        {isDeltaTooSmall() && (
+          <div style={{ color: '#e74c3c' }}>
+            你即将把此题难度从 {problemDifficultyName[originalProblemDifficulty]} 更改到{' '}
+            {problemDifficultyName[problemDifficulty]}。<br />
+            管理组认为，两个跨度及以上的难度更改才是必要的。请再三思考是否有必要改动难度。
+          </div>
+        )}
+      </>
     );
   };
 
@@ -78,7 +90,7 @@ const Panel = () => {
     if (modalShown === 1) {
       result.acceptSolution = problemSolution;
     } else if (modalShown === 2) {
-      result.difficulty = problemDifficulty;
+      result.difficulty = problemDifficultyMapToOld(problemDifficulty);
     } else if (modalShown === 3) {
       result.tags = problemTags;
     }
