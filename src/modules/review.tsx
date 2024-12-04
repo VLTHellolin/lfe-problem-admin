@@ -7,7 +7,7 @@ import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
 
 const Panel = () => {
-  const db = new DB('problem-admin-history');
+  const db = new DB('problem-admin-history', 2);
 
   const historyUpdateHandler = (current: Review) => {
     // If we call setHistory directly, the history value will not be changed immediately.
