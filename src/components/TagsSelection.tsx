@@ -1,6 +1,6 @@
 import type React from 'react';
-import { useState } from 'react';
-import type { TagSection } from '../lib/tags';
+import { useEffect, useState } from 'react';
+import type { Tag, TagSection } from '../lib/tags';
 import clsx from 'clsx';
 
 export interface TagsSelectionProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -17,6 +17,19 @@ export const TagsSelection = ({
   ...props
 }: TagsSelectionProps) => {
   const [filter, setFilter] = useState('');
+  let [selectedTags, setSelectedTags] = useState([] as Tag[]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Tags don't change
+  useEffect(() => {
+    selectedTags = [];
+    setSelectedTags([]);
+    for (const section of tags) {
+      for (const tag of section.children) {
+        if (value?.includes(tag.id)) selectedTags.push(tag);
+      }
+    }
+    setSelectedTags(selectedTags);
+  }, [value]);
 
   return (
     <div className={clsx('pa-tags', className)} {...props}>
@@ -27,6 +40,27 @@ export const TagsSelection = ({
           placeholder='搜索标签'
           onChange={e => setFilter(e.target.value)}
         />
+      </div>
+
+      <div className={clsx('pa-tag-section', selectedTags.length !== 0 && 'shown')}>
+        <div className='pa-tag-title'>已选择标签</div>
+        <div className='pa-tag-list'>
+          {selectedTags.map(f => (
+            <button
+              key={f.id}
+              type='button'
+              className={clsx(
+                'lfe-caption',
+                'pa-tag',
+                'selected',
+                f.name.toLowerCase().includes(filter.toLowerCase()) && 'shown'
+              )}
+              onClick={() => onModify?.(f.id)}
+            >
+              {f.name}
+            </button>
+          ))}
+        </div>
       </div>
 
       {tags.map(e => (
