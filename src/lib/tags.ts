@@ -1,3 +1,6 @@
+import { csGet, csPost } from './request';
+import { showError, showSuccess } from './swal';
+
 export interface Tag {
   id: number;
   name: string;
@@ -58,4 +61,25 @@ export const getFormattedTags = (tags: Record<number, Tag>) => {
     result.find(e => e.id === getSectionId(tag))?.children.push(tag);
   }
   return result;
+};
+
+export const updateTagsIncrementally = async (pid: string[], tags: number[]) => {
+  Promise.all(pid.map(e => csGet(`/problem/${e}?_contentOnly=1`)))
+    .then(resp => {
+      const result = resp.map(e => {
+        // biome-ignore lint/suspicious/noExplicitAny: too lazy
+        return { tags: [...new Set(tags.concat((e.json as any).currentData.problem.tags))] };
+      });
+
+      Promise.all(pid.map((e, i) => csPost(`/sadmin/api/problem/partialUpdate/${e}`, result[i])))
+        .then(() => {
+          showSuccess();
+        })
+        .catch(err => {
+          showError(err);
+        });
+    })
+    .catch(err => {
+      showError(err);
+    });
 };

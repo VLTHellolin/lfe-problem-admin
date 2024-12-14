@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { addHooker, matchUrl } from '../lib/utils';
 import { problemDifficultyMapToOld, problemDifficultyName } from '../lib/difficulty';
-import { getFormattedTags, type TagSection } from '../lib/tags';
+import { getFormattedTags, updateTagsIncrementally, type TagSection } from '../lib/tags';
 import type { ProblemInfo } from '../lib/lfeTypes';
 import { DB } from '../lib/storage';
 import { csPost } from '../lib/request';
@@ -11,6 +11,7 @@ import { LegacyDropdown } from '../components/LegacyDropdown';
 import { Modal } from '../components/Modal';
 import { TagsSelection } from '../components/TagsSelection';
 import { GM_getValue, GM_setValue, GM_registerMenuCommand } from '$';
+import { showError, showSuccess } from '../lib/swal';
 
 const Panel = () => {
   const tagsDB = new DB('lfeData');
@@ -62,6 +63,7 @@ const Panel = () => {
   };
 
   const [problemTags, setProblemTags] = useState(_feInjection.currentData.problem.tags as number[]);
+  const [problemTagsInc, setProblemTagsInc] = useState(false);
   const [tagList, setTagList] = useState([] as TagSection[]);
   // biome-ignore lint/correctness/useExhaustiveDependencies: Only run after the initial render.
   useEffect(() => {
@@ -69,23 +71,46 @@ const Panel = () => {
       setTagList(getFormattedTags(e));
     });
   }, []);
+
   const ProblemTags = () => {
     return (
-      <TagsSelection
-        tags={tagList}
-        value={problemTags}
-        onModify={e => {
-          const index = problemTags.indexOf(e);
-          if (index === -1) setProblemTags([...problemTags, e]);
-          else setProblemTags(problemTags.filter(f => f !== e));
-        }}
-      />
+      <>
+        <label>
+          <input
+            type='checkbox'
+            checked={problemTagsInc}
+            onChange={e => {
+              setProblemTagsInc(e.target.checked);
+              setProblemTags([]);
+            }}
+          />
+          增量更新（而非覆写更新）
+        </label>
+        <TagsSelection
+          tags={tagList}
+          value={problemTags}
+          onModify={e => {
+            const index = problemTags.indexOf(e);
+            if (index === -1) setProblemTags([...problemTags, e]);
+            else setProblemTags(problemTags.filter(f => f !== e));
+          }}
+        />
+      </>
     );
   };
 
   const [problemUpdateList, setProblemUpdateList] = useState('');
 
   const handleSuccess = () => {
+    const list = [_feInjection.currentData.problem.pid];
+    if (problemUpdateList) problemUpdateList.split(' ');
+    setModalShown(0);
+
+    if (modalShown === 3 && problemTagsInc) {
+      updateTagsIncrementally(list, problemTags);
+      return;
+    }
+
     const result: Partial<ProblemInfo> = {};
     if (modalShown === 1) {
       result.acceptSolution = problemSolution;
@@ -95,27 +120,13 @@ const Panel = () => {
       result.tags = problemTags;
     }
 
-    const list = problemUpdateList.split(' ').concat([_feInjection.currentData.problem.pid]);
-    const promiseList = list.map(e => csPost(`/sadmin/api/problem/partialUpdate/${e}`, result));
-
-    Promise.all(promiseList)
+    Promise.all(list.map(e => csPost(`/sadmin/api/problem/partialUpdate/${e}`, result)))
       .then(() => {
-        _feInstance.$swalSuccess('操作成功');
-        const content = document.querySelector('.swal2-container #swal2-content');
-        if (!content) return;
-        content.setAttribute('style', '');
-        content.innerHTML =
-          '<img src="https://cdn.luogu.com.cn/upload/image_hosting/i47l3bvw.png" width="40%"/>';
+        showSuccess();
       })
       .catch(err => {
-        _feInstance.$swalError(
-          '操作失败',
-          '如果你认为这不是你的问题，请找我反馈。错误信息已输出到控制台。'
-        );
-        console.error(err);
+        showError(err);
       });
-
-    setModalShown(0);
   };
 
   return (
