@@ -1,7 +1,7 @@
 {
   "name": "lfe-problem-admin",
   "description": "Problem management panel for lfe",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "author": "hellolin",
   "license": "MIT",
   "module": "src/index.ts",
