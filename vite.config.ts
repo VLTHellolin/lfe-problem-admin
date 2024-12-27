@@ -18,7 +18,7 @@ export default defineConfig({
             'ReactDOM',
             'https://cdn.hellolin.top/npm/react-dom@18.3.1/umd/react-dom.production.min.js',
           ],
-          idb: ['idb', 'https://cdn.hellolin.top/npm/idb@8.0.0/build/umd.js'],
+          idb: ['idb', 'https://cdn.hellolin.top/npm/idb@8.0.1/build/umd.js'],
         },
       },
       userscript: {
