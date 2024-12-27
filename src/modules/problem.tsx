@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { addHooker, matchUrl } from '../lib/utils';
+import { createRoot, type Root } from 'react-dom/client';
+import { addHooker, type Hooker } from '../lib/utils';
 import { problemDifficultyMapToOld, problemDifficultyName } from '../lib/difficulty';
 import { getFormattedTags, updateTagsIncrementally, type TagSection } from '../lib/tags';
 import type { ProblemInfo } from '../lib/lfeTypes';
@@ -10,7 +10,6 @@ import { LegacyButton } from '../components/LegacyButton';
 import { LegacyDropdown } from '../components/LegacyDropdown';
 import { Modal } from '../components/Modal';
 import { TagsSelection } from '../components/TagsSelection';
-import { GM_getValue, GM_setValue, GM_registerMenuCommand } from '$';
 import { showError, showSuccess } from '../lib/swal';
 
 const Panel = () => {
@@ -166,37 +165,30 @@ const Panel = () => {
             />
           </div>
           <br />
-          {modalShown === 1 && ProblemSolution()}
-          {modalShown === 2 && ProblemDifficulty()}
-          {modalShown === 3 && ProblemTags()}
+          {modalShown === 1 && <ProblemSolution />}
+          {modalShown === 2 && <ProblemDifficulty />}
+          {modalShown === 3 && <ProblemTags />}
         </Modal>
       )}
     </>
   );
 };
 
-let loaded = false;
-const hooker = {
-  callback: (nodes: Element[]) => {
+let root: Root;
+const hooker: Hooker = {
+  onMount(elements: Element[]) {
     const rootElement = document.createElement('div');
-    nodes[0].appendChild(rootElement);
+    elements[0].appendChild(rootElement);
     rootElement.id = 'pa-problem-panel';
-    loaded = true;
-    createRoot(rootElement).render(<Panel />);
+
+    root = createRoot(rootElement);
+    root.render(<Panel />);
+  },
+  onUnmount() {
+    root.unmount();
   },
   selector: '.header > .functional > .operation',
-  active: () => !loaded,
+  pathSelector: /^\/problem\/(?!.*(list|solution)).*$/,
 };
 
-if (
-  matchUrl(['/problem']) &&
-  _feInjection.currentTemplate === 'ProblemShow' &&
-  GM_getValue<boolean>('show-problem-panel', true)
-) {
-  addHooker(hooker);
-}
-
-GM_registerMenuCommand('更改是否显示「管理题目」', () => {
-  GM_setValue('show-problem-panel', window.confirm('确认为显示，取消为不显示'));
-  window.location.reload();
-});
+addHooker(hooker);

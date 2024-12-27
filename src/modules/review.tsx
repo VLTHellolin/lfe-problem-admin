@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { addHooker, matchUrl } from '../lib/utils';
+import { createRoot, type Root } from 'react-dom/client';
+import { addHooker, type Hooker } from '../lib/utils';
 import { DB } from '../lib/storage';
 import { articleCategories, type Review } from '../lib/review';
 import { Button } from '../components/Button';
@@ -152,19 +152,22 @@ const Panel = () => {
   );
 };
 
-let loaded = false;
-const hooker = {
-  callback: (nodes: Element[]) => {
+let root: Root;
+const hooker: Hooker = {
+  onMount(elements: Element[]) {
+    document.body.style.overflowY = 'hidden';
+
     const rootElement = document.createElement('div');
-    nodes[0].appendChild(rootElement);
-    loaded = true;
-    createRoot(rootElement).render(<Panel />);
+    elements[0].appendChild(rootElement);
+
+    root = createRoot(rootElement);
+    root.render(<Panel />);
+  },
+  onUnmount() {
+    root.unmount();
   },
   selector: '#app > .top-bar > .left',
-  active: () => !loaded,
+  pathSelector: /^\/sadmin\/article\/review\/?$/,
 };
 
-if (matchUrl(['/sadmin/article/review'])) {
-  document.body.style.overflowY = 'hidden';
-  addHooker(hooker);
-}
+addHooker(hooker);

@@ -1,9 +1,34 @@
-export const matchUrl = (pattern: (RegExp | string)[], withParam = false) => {
-  const current = location.pathname + (withParam ? location.search : '');
-  return pattern.some(e => current.match(e));
+export interface Hooker {
+  onMount: (elements: Element[]) => void;
+  onUnmount: () => void;
+  selector: string;
+  pathSelector: RegExp;
+}
+
+interface HookerWithStatus extends Hooker {
+  mounted: boolean;
+}
+const hookerList: HookerWithStatus[] = [];
+
+export const addHooker = (hooker: Hooker) => {
+  const initHooker: HookerWithStatus = { ...hooker, mounted: false };
+  hookerList.push(initHooker);
+  triggerHooker(initHooker, [document.body]);
 };
 
-const getElemsFromNodes = (nodes: Node[]) => {
+const triggerHooker = (hooker: HookerWithStatus, elements: Element[]) => {
+  const result: Element[] = [];
+  for (const element of elements) {
+    if (element.matches(hooker.selector)) result.push(element);
+    result.push(...element.querySelectorAll(hooker.selector));
+  }
+  if (result.length !== 0) {
+    hooker.onMount(result);
+    hooker.mounted = true;
+  }
+};
+
+const getElementsFromNodes = (nodes: Node[]) => {
   const result: Element[] = [];
   for (const node of nodes) {
     if (node.nodeType === Node.ELEMENT_NODE) {
@@ -15,32 +40,21 @@ const getElemsFromNodes = (nodes: Node[]) => {
   return result;
 };
 
-interface Hooker {
-  callback: (nodes: Element[]) => void;
-  selector: string;
-  active?: () => boolean;
-}
-const execHooker = (hooker: Hooker, nodes: Element[]) => {
-  const result: Element[] = [];
-  for (const node of nodes) {
-    if (node.matches(hooker.selector)) result.push(node);
-    result.push(...node.querySelectorAll(hooker.selector));
-  }
-  if (result.length !== 0) hooker.callback(result);
-};
-
-const hookerList: Hooker[] = [];
 const observer = new MutationObserver(records => {
   for (const record of records) {
-    const rawNodes = record.type === 'attributes' ? [record.target] : Array.from(record.addedNodes);
-    const nodes = getElemsFromNodes(rawNodes);
-    for (const hooker of hookerList) (hooker.active ?? (() => true))() && execHooker(hooker, nodes);
+    const nodes = record.type === 'attributes' ? [record.target] : Array.from(record.addedNodes);
+    const elements = getElementsFromNodes(nodes);
+    for (const hooker of hookerList) {
+      if (!hooker.pathSelector.test(location.pathname)) {
+        if (hooker.mounted) {
+          hooker.onUnmount();
+          hooker.mounted = false;
+        }
+      } else if (!hooker.mounted) {
+        triggerHooker(hooker, elements);
+      }
+    }
   }
 });
-
-export const addHooker = (hooker: Hooker) => {
-  hookerList.push(hooker);
-  execHooker(hooker, [document.body]);
-};
 
 observer.observe(document.body, { childList: true, subtree: true, attributes: true });

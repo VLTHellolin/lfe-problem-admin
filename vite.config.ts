@@ -29,7 +29,7 @@ export default defineConfig({
         version: pkg.version,
         license: pkg.license,
         connect: ['www.luogu.com.cn'],
-        match: ['*://www.luogu.com.cn/problem*', '*://www.luogu.com.cn/sadmin/article/review*'],
+        match: ['*://www.luogu.com.cn/*'],
         updateURL:
           'https://github.com/VLTHellolin/lfe-problem-admin/releases/latest/download/lfe-problem-admin.user.js',
         downloadURL:
