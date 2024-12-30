@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "check": "pnpx biome check --write ."
+    "check": "biome check --write ."
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

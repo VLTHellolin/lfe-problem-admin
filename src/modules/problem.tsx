@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
-import { addHooker, type Hooker } from '../lib/utils';
-import { problemDifficultyMapToOld, problemDifficultyName } from '../lib/difficulty';
-import { getFormattedTags, updateTagsIncrementally, type TagSection } from '../lib/tags';
-import type { ProblemInfo } from '../lib/lfeTypes';
-import { DB } from '../lib/storage';
-import { csPost } from '../lib/request';
+import { StrictMode, useEffect, useState } from 'react';
+import { type Root, createRoot } from 'react-dom/client';
 import { LegacyButton } from '../components/LegacyButton';
 import { LegacyDropdown } from '../components/LegacyDropdown';
 import { Modal } from '../components/Modal';
 import { TagsSelection } from '../components/TagsSelection';
+import { problemDifficultyMapToOld, problemDifficultyName } from '../lib/difficulty';
+import type { ProblemInfo } from '../lib/lfeTypes';
+import { csPost } from '../lib/request';
+import { DB } from '../lib/storage';
 import { showError, showSuccess } from '../lib/swal';
+import { type TagSection, getFormattedTags, updateTagsIncrementally } from '../lib/tags';
+import { type Hooker, addHooker } from '../lib/utils';
 
 const Panel = () => {
   const tagsDB = new DB('lfeData');
@@ -21,11 +21,7 @@ const Panel = () => {
   const ProblemSolution = () => {
     return (
       <label>
-        <input
-          type='checkbox'
-          checked={problemSolution}
-          onChange={e => setProblemSolution(e.target.checked)}
-        />
+        <input type='checkbox' checked={problemSolution} onChange={e => setProblemSolution(e.target.checked)} />
         <span>&nbsp;选中为开，不选为关</span>
       </label>
     );
@@ -34,16 +30,11 @@ const Panel = () => {
   const originalProblemDifficulty = _feInjection.currentData.problem.difficulty as number;
   const [problemDifficulty, setProblemDifficulty] = useState(originalProblemDifficulty);
   const isDeltaTooSmall = () =>
-    originalProblemDifficulty !== 0 &&
-    problemDifficulty !== 0 &&
-    Math.abs(originalProblemDifficulty - problemDifficulty) === 1;
+    originalProblemDifficulty !== 0 && problemDifficulty !== 0 && Math.abs(originalProblemDifficulty - problemDifficulty) === 1;
   const ProblemDifficulty = () => {
     return (
       <>
-        <select
-          value={problemDifficulty}
-          onChange={e => setProblemDifficulty(Number.parseInt(e.target.value))}
-        >
+        <select value={problemDifficulty} onChange={e => setProblemDifficulty(Number.parseInt(e.target.value))}>
           {problemDifficultyName.map((e, i) => (
             <option key={e} value={i}>
               {e}
@@ -52,8 +43,7 @@ const Panel = () => {
         </select>
         {isDeltaTooSmall() && (
           <div style={{ color: '#e74c3c' }}>
-            你即将把此题难度从 {problemDifficultyName[originalProblemDifficulty]} 更改到{' '}
-            {problemDifficultyName[problemDifficulty]}。<br />
+            你即将把此题难度从 {problemDifficultyName[originalProblemDifficulty]} 更改到 {problemDifficultyName[problemDifficulty]}。<br />
             管理组认为，两个跨度及以上的难度更改才是必要的。请再三思考是否有必要改动难度。
           </div>
         )}
@@ -149,20 +139,10 @@ const Panel = () => {
         )}
       </span>
       {modalShown !== 0 && (
-        <Modal
-          header='题目管理'
-          onSuccess={handleSuccess}
-          onCancel={() => setModalShown(0)}
-          long={modalShown === 3}
-        >
+        <Modal header='题目管理' onSuccess={handleSuccess} onCancel={() => setModalShown(0)} long={modalShown === 3}>
           <div>
             如果你要批量操作题目，在下面输入其他题目的 PID，空格分隔。
-            <input
-              type='text'
-              className='lfe-form-sz-small'
-              placeholder='P1001 P1002 ...'
-              onChange={e => setProblemUpdateList(e.target.value)}
-            />
+            <input type='text' className='lfe-form-sz-small' placeholder='P1001 P1002 ...' onChange={e => setProblemUpdateList(e.target.value)} />
           </div>
           <br />
           {modalShown === 1 && <ProblemSolution />}
@@ -182,7 +162,11 @@ const hooker: Hooker = {
     rootElement.id = 'pa-problem-panel';
 
     root = createRoot(rootElement);
-    root.render(<Panel />);
+    root.render(
+      <StrictMode>
+        <Panel />
+      </StrictMode>
+    );
   },
   onUnmount() {
     root.unmount();

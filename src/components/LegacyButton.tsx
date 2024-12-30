@@ -7,11 +7,7 @@ export interface LegacyButtonProps extends React.HTMLAttributes<HTMLButtonElemen
 
 export const LegacyButton = ({ className, children, theme, ...props }: LegacyButtonProps) => {
   return (
-    <button
-      type='button'
-      className={clsx('pa-button lfe-form-sz-middle', theme && `pa-${theme}`, className)}
-      {...props}
-    >
+    <button type='button' className={clsx('pa-button lfe-form-sz-middle', theme && `pa-${theme}`, className)} {...props}>
       {children}
     </button>
   );

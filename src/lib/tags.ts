@@ -32,11 +32,7 @@ export const getFormattedTags = (tags: Record<number, Tag>) => {
     ],
   });
   for (const tag of Object.values(tags)) {
-    if (
-      (tag.type === 'Algorithm' || tag.type === 'Origin') &&
-      tag.id !== -2 &&
-      tag.parent === null
-    ) {
+    if ((tag.type === 'Algorithm' || tag.type === 'Origin') && tag.id !== -2 && tag.parent === null) {
       result.push({ id: tag.id, name: tag.name, children: [tag] });
     }
   }
@@ -52,12 +48,7 @@ export const getFormattedTags = (tags: Record<number, Tag>) => {
   };
 
   for (const tag of Object.values(tags)) {
-    if (
-      (tag.type === 'Algorithm' || tag.type === 'Origin') &&
-      tag.parent === null &&
-      tag.hasChildren
-    )
-      continue;
+    if ((tag.type === 'Algorithm' || tag.type === 'Origin') && tag.parent === null && tag.hasChildren) continue;
     result.find(e => e.id === getSectionId(tag))?.children.push(tag);
   }
   return result;

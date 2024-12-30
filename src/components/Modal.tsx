@@ -8,15 +8,7 @@ export interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   onCancel?: () => void;
 }
 
-export const Modal = ({
-  className,
-  children,
-  header,
-  long,
-  onSuccess,
-  onCancel,
-  ...props
-}: ModalProps) => {
+export const Modal = ({ className, children, header, long, onSuccess, onCancel, ...props }: ModalProps) => {
   return (
     <div className={clsx('pa-modal', 'pa-fadein', long && 'long', className)} {...props}>
       <div className='pa-modal-background' />

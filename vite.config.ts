@@ -1,7 +1,7 @@
-import pkg from './package.json';
-import { defineConfig } from 'vite';
 import reactPlugin from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 import monkey from 'vite-plugin-monkey';
+import pkg from './package.json';
 
 export default defineConfig({
   build: {
@@ -14,10 +14,7 @@ export default defineConfig({
       build: {
         externalGlobals: {
           react: ['React', 'https://cdn.hellolin.top/npm/react@18.3.1/umd/react.production.min.js'],
-          'react-dom': [
-            'ReactDOM',
-            'https://cdn.hellolin.top/npm/react-dom@18.3.1/umd/react-dom.production.min.js',
-          ],
+          'react-dom': ['ReactDOM', 'https://cdn.hellolin.top/npm/react-dom@18.3.1/umd/react-dom.production.min.js'],
           idb: ['idb', 'https://cdn.hellolin.top/npm/idb@8.0.1/build/umd.js'],
         },
       },
@@ -30,10 +27,8 @@ export default defineConfig({
         license: pkg.license,
         connect: ['www.luogu.com.cn'],
         match: ['*://www.luogu.com.cn/*'],
-        updateURL:
-          'https://github.com/VLTHellolin/lfe-problem-admin/releases/latest/download/lfe-problem-admin.user.js',
-        downloadURL:
-          'https://github.com/VLTHellolin/lfe-problem-admin/releases/latest/download/lfe-problem-admin.user.js',
+        updateURL: 'https://github.com/VLTHellolin/lfe-problem-admin/releases/latest/download/lfe-problem-admin.user.js',
+        downloadURL: 'https://github.com/VLTHellolin/lfe-problem-admin/releases/latest/download/lfe-problem-admin.user.js',
       },
     }),
   ],

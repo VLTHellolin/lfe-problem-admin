@@ -40,18 +40,10 @@ export const csGet = async <T = unknown>(url: string, headers: Record<string, st
     url,
     headers,
   });
-export const csPost = async <T = unknown>(
-  url: string,
-  data: string | object,
-  headers: Record<string, string> = {},
-  type = 'application/json'
-) =>
+export const csPost = async <T = unknown>(url: string, data: string | object, headers: Record<string, string> = {}, type = 'application/json') =>
   await csRequest<T>({
     method: 'POST',
     url,
     data: typeof data === 'string' ? data : JSON.stringify(data),
-    headers: Object.assign(
-      { 'Content-Type': typeof data === 'string' ? type : 'application/json' },
-      headers
-    ),
+    headers: Object.assign({ 'Content-Type': typeof data === 'string' ? type : 'application/json' }, headers),
   });

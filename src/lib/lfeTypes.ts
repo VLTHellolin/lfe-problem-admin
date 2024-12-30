@@ -4,10 +4,7 @@ export interface FeInjection {
   // biome-ignore lint/suspicious/noExplicitAny:
   currentData: any;
 }
-export type FeSwalFunction = (
-  titleText: string,
-  text?: string
-) => { params: { titleText: string; text: string; type: string } };
+export type FeSwalFunction = (titleText: string, text?: string) => { params: { titleText: string; text: string; type: string } };
 export interface FeInstance {
   $swal: FeSwalFunction;
   $swalInfo: FeSwalFunction;

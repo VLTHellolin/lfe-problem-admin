@@ -1,7 +1,7 @@
+import clsx from 'clsx';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import type { Tag, TagSection } from '../lib/tags';
-import clsx from 'clsx';
 
 export interface TagsSelectionProps extends React.HTMLAttributes<HTMLDivElement> {
   tags: TagSection[];
@@ -9,13 +9,7 @@ export interface TagsSelectionProps extends React.HTMLAttributes<HTMLDivElement>
   onModify?: (e: number) => void;
 }
 
-export const TagsSelection = ({
-  className,
-  tags,
-  value,
-  onModify,
-  ...props
-}: TagsSelectionProps) => {
+export const TagsSelection = ({ className, tags, value, onModify, ...props }: TagsSelectionProps) => {
   const [filter, setFilter] = useState('');
   let [selectedTags, setSelectedTags] = useState([] as Tag[]);
 
@@ -34,12 +28,7 @@ export const TagsSelection = ({
   return (
     <div className={clsx('pa-tags', className)} {...props}>
       <div className='pa-tag-section shown'>
-        <input
-          type='text'
-          className='pa-tag-search lfe-form-sz-small'
-          placeholder='搜索标签'
-          onChange={e => setFilter(e.target.value)}
-        />
+        <input type='text' className='pa-tag-search lfe-form-sz-small' placeholder='搜索标签' onChange={e => setFilter(e.target.value)} />
       </div>
 
       <div className={clsx('pa-tag-section', selectedTags.length !== 0 && 'shown')}>
@@ -49,12 +38,7 @@ export const TagsSelection = ({
             <button
               key={f.id}
               type='button'
-              className={clsx(
-                'lfe-caption',
-                'pa-tag',
-                'selected',
-                f.name.toLowerCase().includes(filter.toLowerCase()) && 'shown'
-              )}
+              className={clsx('lfe-caption', 'pa-tag', 'selected', f.name.toLowerCase().includes(filter.toLowerCase()) && 'shown')}
               onClick={() => onModify?.(f.id)}
             >
               {f.name}
@@ -64,13 +48,7 @@ export const TagsSelection = ({
       </div>
 
       {tags.map(e => (
-        <div
-          key={e.name}
-          className={clsx(
-            'pa-tag-section',
-            e.children.some(f => f.name.toLowerCase().includes(filter.toLowerCase())) && 'shown'
-          )}
-        >
+        <div key={e.name} className={clsx('pa-tag-section', e.children.some(f => f.name.toLowerCase().includes(filter.toLowerCase())) && 'shown')}>
           <div className='pa-tag-title'>{e.name}</div>
           <div className='pa-tag-list'>
             {e.children.map(f => (

@@ -11,12 +11,7 @@ export const Button = ({ className, children, theme, spacing, size, ...props }: 
   return (
     <button
       type='button'
-      className={clsx(
-        `pa-button solid lform-size-${size ?? 'middle'}`,
-        theme && `pa-${theme}`,
-        spacing && 'pa-spacing',
-        className
-      )}
+      className={clsx(`pa-button solid lform-size-${size ?? 'middle'}`, theme && `pa-${theme}`, spacing && 'pa-spacing', className)}
       {...props}
     >
       {children}
