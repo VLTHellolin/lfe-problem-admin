@@ -21,21 +21,25 @@ const Panel = () => {
     (async () => {
       const dbHistory = (await db.get('history')) ?? [];
       const nextTotalCount = [0, 0];
+      const nextWeekCount = [0, 0];
+
+      updateWeekDuration();
 
       for (const current of dbHistory) {
         ++nextTotalCount[current.accepted ? 1 : 0];
+        if (new Date(current.time) >= weekStart) ++nextWeekCount[current.accepted ? 1 : 0];
       }
 
       setHistory(dbHistory);
       setTotalCount(nextTotalCount);
-      updateOutdatedWeekCount();
+      setWeekCount(nextWeekCount);
     })();
 
     window.addEventListener('luogu:admin:article-review', articleReviewHandler);
     return () => window.removeEventListener('luogu:admin:article-review', articleReviewHandler);
   }, []);
 
-  const updateOutdatedWeekCount = () => {
+  const updateWeekDuration = () => {
     const date = new Date();
     const weekDay = date.getDay();
     date.setDate(date.getDate() - (weekDay === 0 ? 6 : weekDay - 1));
@@ -43,27 +47,23 @@ const Panel = () => {
     weekStart = new Date(date);
     date.setDate(date.getDate() + 7);
     weekEnd = new Date(date);
-
-    const nextWeekCount = [0, 0];
-    for (let i = history.length - 1; i >= 0; --i) {
-      const current = history[i];
-      if (new Date(current.time) < weekStart) break;
-      ++nextWeekCount[current.accepted ? 1 : 0];
-    }
-
-    setWeekCount(nextWeekCount);
   };
 
   const historyUpdateHandler = (current: Review) => {
     setHistory(h => {
       const result = [...h, current];
       db.set('history', result);
+
+      if (new Date() >= weekEnd) {
+        updateWeekDuration();
+        setWeekCount(c => [0, 0]);
+      }
+
+      setTotalCount(c => [c[0] + (current.accepted ? 0 : 1), c[1] + (current.accepted ? 1 : 0)]);
+      setWeekCount(c => [c[0] + (current.accepted ? 0 : 1), c[1] + (current.accepted ? 1 : 0)]);
+
       return result;
     });
-    setTotalCount(c => [c[0] + (current.accepted ? 0 : 1), c[1] + (current.accepted ? 1 : 0)]);
-
-    if (new Date() < weekEnd) setWeekCount(c => [c[0] + (current.accepted ? 0 : 1), c[1] + (current.accepted ? 1 : 0)]);
-    else updateOutdatedWeekCount();
   };
   const articleReviewHandler = (e: Event) => {
     const detail = (e as CustomEvent).detail;

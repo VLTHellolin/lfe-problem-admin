@@ -13,6 +13,7 @@ export default defineConfig({
       entry: 'src/index.ts',
       build: {
         externalGlobals: {
+          clsx: ['clsx', 'https://cdn.hellolin.top/npm/clsx@2.1.1/dist/clsx.min.js'],
           react: ['React', 'https://cdn.hellolin.top/npm/react@18.3.1/umd/react.production.min.js'],
           'react-dom': ['ReactDOM', 'https://cdn.hellolin.top/npm/react-dom@18.3.1/umd/react-dom.production.min.js'],
           idb: ['idb', 'https://cdn.hellolin.top/npm/idb@8.0.1/build/umd.js'],
