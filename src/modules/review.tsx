@@ -1,37 +1,77 @@
-import { useEffect, useState } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
-import { addHooker, type Hooker } from '../lib/utils';
-import { DB } from '../lib/storage';
-import { articleCategories, type Review } from '../lib/review';
+import { StrictMode, useEffect, useState } from 'react';
+import { type Root, createRoot } from 'react-dom/client';
 import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
+import { type Review, articleCategories } from '../lib/review';
+import { DB } from '../lib/storage';
+import { type Hooker, addHooker } from '../lib/utils';
 
 const Panel = () => {
   const db = new DB('problem-admin-history', 2);
+  const [modalShown, setModalShown] = useState(false);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [totalCount, setTotalCount] = useState([0, 0]);
+  const [weekCount, setWeekCount] = useState([0, 0]);
+  const [history, setHistory] = useState([] as Review[]);
+  let weekStart = new Date();
+  let weekEnd = new Date();
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run after the initial render.
+  useEffect(() => {
+    (async () => {
+      const dbHistory = (await db.get('history')) ?? [];
+      const nextTotalCount = [0, 0];
+
+      for (const current of dbHistory) {
+        ++nextTotalCount[current.accepted ? 1 : 0];
+      }
+
+      setHistory(dbHistory);
+      setTotalCount(nextTotalCount);
+      updateOutdatedWeekCount();
+    })();
+
+    window.addEventListener('luogu:admin:article-review', articleReviewHandler);
+    return () => window.removeEventListener('luogu:admin:article-review', articleReviewHandler);
+  }, []);
+
+  const updateOutdatedWeekCount = () => {
+    const date = new Date();
+    const weekDay = date.getDay();
+    date.setDate(date.getDate() - (weekDay === 0 ? 6 : weekDay - 1));
+    date.setHours(0, 0, 0, 0);
+    weekStart = new Date(date);
+    date.setDate(date.getDate() + 7);
+    weekEnd = new Date(date);
+
+    const nextWeekCount = [0, 0];
+    for (let i = history.length - 1; i >= 0; --i) {
+      const current = history[i];
+      if (new Date(current.time) < weekStart) break;
+      ++nextWeekCount[current.accepted ? 1 : 0];
+    }
+
+    setWeekCount(nextWeekCount);
+  };
 
   const historyUpdateHandler = (current: Review) => {
-    // If we call setHistory directly, the history value will not be changed immediately.
-    // To avoid database problems, we use the following method.
-    history.push(current);
-    setHistory(history);
-    db.set('history', history);
+    setHistory(h => {
+      const result = [...h, current];
+      db.set('history', result);
+      return result;
+    });
+    setTotalCount(c => [c[0] + (current.accepted ? 0 : 1), c[1] + (current.accepted ? 1 : 0)]);
 
-    ++totalCount[current.accepted ? 1 : 0];
-    ++weekCount[current.accepted ? 1 : 0];
-    setTotalCount(totalCount);
-    setWeekCount(weekCount);
-
-    if (new Date() >= weekEnd) updateWeekCount();
+    if (new Date() < weekEnd) setWeekCount(c => [c[0] + (current.accepted ? 0 : 1), c[1] + (current.accepted ? 1 : 0)]);
+    else updateOutdatedWeekCount();
   };
   const articleReviewHandler = (e: Event) => {
     const detail = (e as CustomEvent).detail;
     const article = detail.getArticle();
 
-    document
-      .querySelector(
-        '#app .main-container .main .l-card:last-child .review-header:last-child button'
-      )
-      ?.addEventListener('click', () => {
+    document.body.querySelector('#app .main-container .main .l-card:last-child .review-header:last-child button')?.addEventListener(
+      'click',
+      () => {
         const current = {
           id: article.lid,
           author: article.author.uid,
@@ -44,57 +84,17 @@ const Panel = () => {
         };
         // Avoid slow re-rendering.
         setTimeout(() => historyUpdateHandler(current));
-      });
+      },
+      { once: true }
+    );
   };
-
-  const [modalShown, setModalShown] = useState(false);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [totalCount, setTotalCount] = useState([0, 0] as [number, number]);
-  const [weekCount, setWeekCount] = useState([0, 0] as [number, number]);
-  let [history, setHistory] = useState([] as Review[]);
-  let weekStart = new Date();
-  let weekEnd = new Date();
-
-  const updateWeekCount = () => {
-    const date = new Date();
-    const weekDay = date.getDay();
-    date.setDate(date.getDate() - (weekDay === 0 ? 6 : weekDay - 1));
-    date.setHours(0, 0, 0, 0);
-    weekStart = new Date(date);
-    date.setDate(date.getDate() + 7);
-    weekEnd = new Date(date);
-    for (let i = history.length - 1; i >= 0; --i) {
-      const current = history[i];
-      if (new Date(current.time) < weekStart) break;
-      ++weekCount[current.accepted ? 1 : 0];
-    }
-    setWeekCount(weekCount);
-  };
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run after the initial render.
-  useEffect(() => {
-    (async () => {
-      history = (await db.get('history')) ?? [];
-      setHistory(history);
-      for (const current of history) {
-        ++totalCount[current.accepted ? 1 : 0];
-      }
-      setTotalCount(totalCount);
-      updateWeekCount();
-    })();
-    window.addEventListener('luogu:admin:article-review', articleReviewHandler);
-    return () => window.removeEventListener('luogu:admin:article-review', articleReviewHandler);
-  }, []);
 
   const getRateText = (a: number, b: number) => {
     if (a + b === 0) return `${a + b} / ${a} / ${b} / 0%`;
     return `${a + b} / ${a} / ${b} / ${((a / (a + b)) * 100).toFixed(2).toString()}%`;
   };
   const confirmDelete = async () => {
-    if (
-      window.confirm('确实要清除历史记录吗？所有数据将无法恢复！') &&
-      window.confirm('第二次确认，确实要清除吗？')
-    ) {
+    if (window.confirm('确实要清除历史记录吗？所有数据将无法恢复！') && window.confirm('第二次确认，确实要清除吗？')) {
       await db.clear();
       window.alert('操作完成。');
       window.location.reload();
@@ -121,7 +121,7 @@ const Panel = () => {
           <Button size='small' onClick={() => pageNumber !== 1 && setPageNumber(pageNumber - 1)}>
             上一页
           </Button>
-          <Button size='small' onClick={() => setPageNumber(pageNumber + 1)}>
+          <Button size='small' onClick={() => pageNumber !== Math.ceil(history.length / 50) && setPageNumber(pageNumber + 1)}>
             下一页
           </Button>
           <br />
@@ -131,17 +131,12 @@ const Panel = () => {
               .reverse()
               .map(e => (
                 <li key={e.time}>
-                  <a
-                    href={`https://www.luogu.com.cn/article/${e.id}/edit`}
-                    target='_blank'
-                    rel='noreferrer'
-                  >
+                  <a href={`https://www.luogu.com.cn/article/${e.id}/edit`} target='_blank' rel='noreferrer'>
                     U{e.author} 的文章
                     {e.title && `：${e.title}`}
                     {e.category && e.category !== 2 && `，${articleCategories[e.category]}`}
                     {e.pid && `，作为 ${e.pid} 的题解`}
-                    {e.collection && `，投稿至 ${e.collection.id} ${e.collection.name}`}，
-                    {e.accepted ? '通过' : '打回'}，{e.time}
+                    {e.collection && `，投稿至 ${e.collection.id} ${e.collection.name}`}，{e.accepted ? '通过' : '打回'}，{e.time}
                   </a>
                 </li>
               ))}
@@ -155,15 +150,21 @@ const Panel = () => {
 let root: Root;
 const hooker: Hooker = {
   onMount(elements: Element[]) {
-    document.body.style.overflowY = 'hidden';
+    document.body.classList.add('pa-overflow-fix');
 
     const rootElement = document.createElement('div');
     elements[0].appendChild(rootElement);
 
     root = createRoot(rootElement);
-    root.render(<Panel />);
+    root.render(
+      <StrictMode>
+        <Panel />
+      </StrictMode>
+    );
   },
   onUnmount() {
+    document.body.classList.remove('pa-overflow-fix');
+
     root.unmount();
   },
   selector: '#app > .top-bar > .left',
