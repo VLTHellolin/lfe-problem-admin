@@ -5,6 +5,6 @@ declare global {
   const _feInstance: FeInstance | undefined;
 }
 
-import './assets/index.styl';
+import './assets/index.css';
 import './modules/problem';
 import './modules/review';

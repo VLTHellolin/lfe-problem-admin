@@ -1,0 +1,13 @@
+body.pa-overflow-fix {
+  overflow-y: hidden;
+}
+
+@media (max-width: 576px) {
+  #pa-problem-panel {
+    width: 100%;
+    margin-bottom: .5em;
+    button {
+      width: 100%;
+    }
+  }
+}

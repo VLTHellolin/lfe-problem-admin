@@ -1,0 +1,61 @@
+.pa-modal {
+  display: block;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: auto;
+  z-index: 114514;
+  line-height: 1.4;
+  .pa-modal-background {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, .3);
+  }
+  &.long .pa-modal-outer-container {
+    height: 600px;
+  }
+  .pa-modal-outer-container {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    overflow-y: auto;
+    max-width: 100%;
+    max-height: 90vh;
+    width: 700px;
+    padding: 1.2em;
+    margin-bottom: 1.2em;
+    background: #fff;
+    color: #000;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(26, 26, 26, .1);
+    box-sizing: border-box;
+    .pa-modal-inner-container {
+      display: flex;
+      flex-flow: column;
+      height: 100%;
+      align-items: stretch;
+      & > *{
+        flex: 0 0 auto;
+      }
+      .pa-modal-main {
+        margin-top: 10px;
+        flex: 1 1 auto;
+        overflow-y: auto;
+        select {
+          padding: .3em .6em;
+        }
+        .pa-modal-actions > button {
+          float: right;
+          font-size: .875em;
+          padding: .3125em 1em;
+        }
+      }
+    }
+  }
+}

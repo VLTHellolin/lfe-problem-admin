@@ -1,0 +1,34 @@
+.pa-tags {
+  .pa-tag-selection {
+    border-bottom: 1px solid #e8e8e8;
+    padding-bottom: 1.5em;
+    display: none;
+    &.shown {
+      display: block;
+    }
+    .pa-tag-title {
+      color: rgba(0, 0, 0, .85);
+      margin: 1.2em 0;
+    }
+    .pa-tag {
+      margin-right: .8em;
+      margin-bottom: .8em;
+      padding: 1px 8px;
+      cursor: pointer;
+      box-sizing: border-box;
+      border-radius: 2px;
+      font-weight: 400;
+      color: #000;
+      background: rgb(232, 232, 232);
+      border: 1px solid rgb(191, 191, 191);
+      display: none;
+      &.shown {
+        display: inline-block;
+      }
+      &.selected {
+        background: #2949b4;
+        border-color: 1px solid #223e99;
+      }
+    }
+  }
+}
