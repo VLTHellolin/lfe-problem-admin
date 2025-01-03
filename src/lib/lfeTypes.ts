@@ -1,8 +1,7 @@
 export interface FeInjection {
   currentTemplate: string;
   currentUser: { isAdmin: boolean };
-  // biome-ignore lint/suspicious/noExplicitAny:
-  currentData: any;
+  currentData: { problem: ProblemInfo };
 }
 export type FeSwalFunction = (titleText: string, text?: string) => { params: { titleText: string; text: string; type: string } };
 export interface FeInstance {
@@ -19,5 +18,6 @@ export interface FeInstance {
 export interface ProblemInfo {
   acceptSolution: boolean;
   difficulty: number;
+  pid: string;
   tags: number[];
 }

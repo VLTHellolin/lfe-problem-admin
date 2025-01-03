@@ -11,13 +11,37 @@ import { DB } from '../lib/storage';
 import { showError, showSuccess } from '../lib/swal';
 import { type TagSection, getFormattedTags, updateTagsIncrementally } from '../lib/tags';
 import { type Hooker, addHooker } from '../lib/utils';
+import { getProblemData } from '../lib/problem';
 
 const Panel = () => {
   const tagsDB = new DB('lfeData');
+  const [tagList, setTagList] = useState([] as TagSection[]);
+
+  const [currentProblem, setCurrentProblem] = useState({} as ProblemInfo);
+  const [problemSolution, setProblemSolution] = useState(false);
+  const [problemDifficulty, setProblemDifficulty] = useState(0);
+  const [problemTags, setProblemTags] = useState([] as number[]);
+
+  const [problemTagsInc, setProblemTagsInc] = useState(false);
+  const [problemUpdateList, setProblemUpdateList] = useState('');
+
   const [dropdownShown, setDropdownShown] = useState(false);
   const [modalShown, setModalShown] = useState(0);
 
-  const [problemSolution, setProblemSolution] = useState(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run after the initial render.
+  useEffect(() => {
+    tagsDB.get('luoguTags').then(e => {
+      setTagList(getFormattedTags(e));
+    });
+    (async () => {
+      const data = await getProblemData();
+      if (data === undefined) return;
+      setCurrentProblem(data);
+      setProblemDifficulty(data.difficulty);
+      setProblemTags(data.tags);
+    })();
+  }, []);
+
   const ProblemSolution = () => {
     return (
       <label>
@@ -27,10 +51,8 @@ const Panel = () => {
     );
   };
 
-  const originalProblemDifficulty = _feInjection.currentData.problem.difficulty as number;
-  const [problemDifficulty, setProblemDifficulty] = useState(originalProblemDifficulty);
   const isDeltaTooSmall = () =>
-    originalProblemDifficulty !== 0 && problemDifficulty !== 0 && Math.abs(originalProblemDifficulty - problemDifficulty) === 1;
+    currentProblem.difficulty !== 0 && problemDifficulty !== 0 && Math.abs(currentProblem.difficulty - problemDifficulty) === 1;
   const ProblemDifficulty = () => {
     return (
       <>
@@ -43,23 +65,13 @@ const Panel = () => {
         </select>
         {isDeltaTooSmall() && (
           <div style={{ color: '#e74c3c' }}>
-            你即将把此题难度从 {problemDifficultyName[originalProblemDifficulty]} 更改到 {problemDifficultyName[problemDifficulty]}。<br />
+            你即将把此题难度从 {problemDifficultyName[currentProblem.difficulty]} 更改到 {problemDifficultyName[problemDifficulty]}。<br />
             管理组认为，两个跨度及以上的难度更改才是必要的。请再三思考是否有必要改动难度。
           </div>
         )}
       </>
     );
   };
-
-  const [problemTags, setProblemTags] = useState(_feInjection.currentData.problem.tags as number[]);
-  const [problemTagsInc, setProblemTagsInc] = useState(false);
-  const [tagList, setTagList] = useState([] as TagSection[]);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run after the initial render.
-  useEffect(() => {
-    tagsDB.get('luoguTags').then(e => {
-      setTagList(getFormattedTags(e));
-    });
-  }, []);
 
   const ProblemTags = () => {
     return (
@@ -88,10 +100,8 @@ const Panel = () => {
     );
   };
 
-  const [problemUpdateList, setProblemUpdateList] = useState('');
-
   const handleSuccess = () => {
-    const list = [_feInjection.currentData.problem.pid];
+    const list = [currentProblem.pid];
     if (problemUpdateList) problemUpdateList.split(' ');
     setModalShown(0);
 
@@ -155,24 +165,36 @@ const Panel = () => {
 };
 
 let root: Root;
-const hooker: Hooker = {
-  onMount(elements: Element[]) {
-    const rootElement = document.createElement('div');
-    elements[0].appendChild(rootElement);
-    rootElement.id = 'pa-problem-panel';
+const onMount = (elements: Element[]) => {
+  const rootElement = document.createElement('div');
+  elements[0].appendChild(rootElement);
+  rootElement.id = 'pa-problem-panel';
 
-    root = createRoot(rootElement);
-    root.render(
-      <StrictMode>
-        <Panel />
-      </StrictMode>
-    );
-  },
-  onUnmount() {
-    root.unmount();
-  },
+  root = createRoot(rootElement);
+  root.render(
+    <StrictMode>
+      <Panel />
+    </StrictMode>
+  );
+};
+const onUnmount = () => {
+  root.unmount();
+};
+
+const hooker: Hooker = {
+  onMount,
+  onUnmount,
   selector: '.header > .functional > .operation',
   pathSelector: /^\/problem\/(?!.*(list|solution)).*$/,
 };
 
 addHooker(hooker);
+
+const solutionHooker: Hooker = {
+  onMount,
+  onUnmount,
+  selector: '.main-container header .header-layout > div',
+  pathSelector: /^\/problem\/solution\/.*$/,
+};
+
+addHooker(solutionHooker);
