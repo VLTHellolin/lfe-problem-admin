@@ -1,8 +1,7 @@
-import type { FeInjection, FeInstance } from './lib/lfeTypes';
+import type { FeInjection } from './lib/lfeTypes';
 
 declare global {
   const _feInjection: FeInjection | undefined;
-  const _feInstance: FeInstance | undefined;
 }
 
 import './assets/index.css';

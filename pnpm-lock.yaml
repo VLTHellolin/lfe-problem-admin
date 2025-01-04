@@ -20,6 +20,9 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      sweetalert2:
+        specifier: ^11.15.10
+        version: 11.15.10
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.9.4
@@ -920,6 +923,9 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  sweetalert2@11.15.10:
+    resolution: {integrity: sha512-Sjiwcd5mWiz8X0JFkHsso2EPVQHrLCjVv+xR6Ry2LKf4KY6kSi4U5pM0Tgmn1c7SMfkyDqPal2NWqwj6vck8bw==}
+
   systemjs@6.15.1:
     resolution: {integrity: sha512-Nk8c4lXvMB98MtbmjX7JwJRgJOL8fluecYCfCeYBznwmpOs8Bf15hLM6z4z71EDAhQVrQrI+wt1aLWSXZq+hXA==}
 
@@ -1802,6 +1808,8 @@ snapshots:
     optional: true
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  sweetalert2@11.15.10: {}
 
   systemjs@6.15.1: {}
 
