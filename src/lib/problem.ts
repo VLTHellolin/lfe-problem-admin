@@ -1,5 +1,4 @@
-import type { FeInjection } from './lfeTypes';
-import { csGet } from './request';
+import { request } from './request';
 
 export const getProblemData = async () => {
   if (typeof _feInjection !== 'undefined') {
@@ -12,7 +11,7 @@ export const getProblemData = async () => {
   }
 
   const pid = result[1];
-  const resp = (await csGet(`/problem/${pid}?_contentOnly=1`)).json as FeInjection;
+  const resp = await (await request(`/problem/${pid}?_contentOnly=1`)).json();
 
   return resp.currentData.problem;
 };

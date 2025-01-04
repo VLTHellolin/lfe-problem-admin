@@ -1,4 +1,4 @@
-import { csGet, csPost } from './request';
+import { request } from './request';
 import { showError, showSuccess } from './swal';
 
 export interface Tag {
@@ -55,22 +55,34 @@ export const getFormattedTags = (tags: Record<number, Tag>) => {
 };
 
 export const updateTagsIncrementally = async (pid: string[], tags: number[]) => {
-  Promise.all(pid.map(e => csGet(`/problem/${e}?_contentOnly=1`)))
-    .then(resp => {
-      const result = resp.map(e => {
-        // biome-ignore lint/suspicious/noExplicitAny: too lazy
-        return { tags: [...new Set(tags.concat((e.json as any).currentData.problem.tags))] };
-      });
+  const maxConcurrentRequests = 3;
+  const requestDelay = 700;
 
-      Promise.all(pid.map((e, i) => csPost(`/sadmin/api/problem/partialUpdate/${e}`, result[i])))
-        .then(() => {
-          showSuccess();
-        })
-        .catch(err => {
-          showError(err);
-        });
-    })
-    .catch(err => {
-      showError(err);
-    });
+  let index = 0;
+
+  const processQueue = async () => {
+    if (index >= pid.length) return;
+
+    for (let i = 0; i < maxConcurrentRequests && index < pid.length; i++) {
+      const result = await (await request(`/problem/${pid[index]}?_contentOnly=1`)).json();
+      const newTags = [...new Set(tags.concat(result.currentData.problem.tags))];
+      await request(`/sadmin/api/problem/partialUpdate/${pid[index]}`, {
+        method: 'POST',
+        body: { tags: newTags },
+      });
+      index++;
+    }
+
+    await new Promise(r => setTimeout(r, requestDelay));
+    await processQueue();
+  };
+
+  try {
+    await processQueue();
+  } catch (err) {
+    showError(err);
+    return;
+  }
+
+  showSuccess();
 };

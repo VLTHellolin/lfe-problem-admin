@@ -9,3 +9,9 @@ export interface ProblemInfo {
   pid: string;
   tags: number[];
 }
+export interface StringifiedProblemInfo {
+  acceptSolution: string;
+  difficulty: string;
+  pid: string;
+  tags: string;
+}

@@ -5,6 +5,7 @@ import { type Hooker, addHooker } from '../lib/utils';
 import { loadSolutionSelection, type Solution } from '../lib/solution';
 import { DB } from '../lib/storage';
 import { Modal } from '../components/Modal';
+import { request } from '../lib/request';
 
 const Panel = () => {
   const [modalShown, setModalShown] = useState(false);
@@ -16,7 +17,7 @@ const Panel = () => {
     const [sentRequests, setSentRequests] = useState(0);
     const [sentState, setSentState] = useState(0);
     const maxConcurrentRequests = 5;
-    const requestDelay = 1000;
+    const requestDelay = 700;
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: only run after the initial render.
     useEffect(() => {
@@ -30,7 +31,7 @@ const Panel = () => {
         if (index >= selectedSolution.length) return;
 
         for (let i = 0; i < maxConcurrentRequests && index < selectedSolution.length; i++) {
-          await fetch(`/sadmin/api/article/promote/${selectedSolution[index++].id}?withdraw=1`, {
+          await request(`/sadmin/api/article/promote/${selectedSolution[index++].id}?withdraw=1`, {
             method: 'POST',
           });
           setSentRequests(e => e + 1);
