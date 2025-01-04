@@ -50,11 +50,11 @@
         select {
           padding: .3em .6em;
         }
-        .pa-modal-actions > button {
-          float: right;
-          font-size: .875em;
-          padding: .3125em 1em;
-        }
+      }
+      .pa-modal-actions > button {
+        float: right;
+        font-size: .875em;
+        padding: .3125em 1em;
       }
     }
   }

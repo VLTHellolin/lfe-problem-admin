@@ -1,7 +1,7 @@
 import { StrictMode, useEffect, useState } from 'react';
 import { type Root, createRoot } from 'react-dom/client';
-import { LegacyButton } from '../components/LegacyButton';
-import { LegacyDropdown } from '../components/LegacyDropdown';
+import { Button } from '../components/Button';
+import { Dropdown } from '../components/Dropdown';
 import { Modal } from '../components/Modal';
 import { TagsSelection } from '../components/TagsSelection';
 import { problemDifficultyMapToOld, problemDifficultyName } from '../lib/difficulty';
@@ -131,21 +131,21 @@ const Panel = () => {
   return (
     <>
       <span>
-        <LegacyButton theme='dark' onClick={() => setDropdownShown(!dropdownShown)}>
+        <Button theme='dark' onClick={() => setDropdownShown(!dropdownShown)}>
           管理题目
-        </LegacyButton>
+        </Button>
         {dropdownShown && (
-          <LegacyDropdown>
-            <LegacyButton theme='primary' onClick={() => setModalShown(1)}>
+          <Dropdown>
+            <Button theme='primary' onClick={() => setModalShown(1)}>
               题解通道
-            </LegacyButton>
-            <LegacyButton theme='primary' onClick={() => setModalShown(2)}>
+            </Button>
+            <Button theme='primary' onClick={() => setModalShown(2)}>
               题目难度
-            </LegacyButton>
-            <LegacyButton theme='primary' onClick={() => setModalShown(3)}>
+            </Button>
+            <Button theme='primary' onClick={() => setModalShown(3)}>
               题目标签
-            </LegacyButton>
-          </LegacyDropdown>
+            </Button>
+          </Dropdown>
         )}
       </span>
       {modalShown !== 0 && (
@@ -193,7 +193,7 @@ addHooker(hooker);
 const solutionHooker: Hooker = {
   onMount,
   onUnmount,
-  selector: '.main-container header .header-layout > div',
+  selector: '.main-container header .header-layout > div > div',
   pathSelector: /^\/problem\/solution\/.*$/,
 };
 

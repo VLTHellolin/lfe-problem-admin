@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { LegacyButton } from './LegacyButton';
+import { Button } from './Button';
 
 export interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   header?: string;
@@ -17,10 +17,10 @@ export const Modal = ({ className, children, header, long, onSuccess, onCancel, 
           <h3 className='pa-modal-header lfe-h3'>{header}</h3>
           <div className='pa-modal-main'>{children}</div>
           <div className='pa-modal-actions'>
-            <LegacyButton theme='primary' onClick={() => onSuccess?.()}>
+            <Button theme='primary' onClick={() => onSuccess?.()}>
               确认
-            </LegacyButton>
-            {onCancel && <LegacyButton onClick={() => onCancel()}>取消</LegacyButton>}
+            </Button>
+            {onCancel && <Button onClick={() => onCancel()}>取消</Button>}
           </div>
         </div>
       </div>

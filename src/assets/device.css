@@ -11,3 +11,11 @@ body.pa-overflow-fix {
     }
   }
 }
+
+.main-container header .header-layout > div > div {
+  display: flex;
+  align-items: baseline;
+  .pa-button.pa-dark {
+    border-width: 1px !important;
+  }
+}
