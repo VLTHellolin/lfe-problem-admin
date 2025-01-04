@@ -1,11 +1,11 @@
-import { createRoot, type Root } from 'react-dom/client';
-import { Button } from '../components/Button';
 import { StrictMode, useEffect, useState } from 'react';
-import { type Hooker, addHooker } from '../lib/utils';
-import { loadSolutionSelection, type Solution } from '../lib/solution';
-import { DB } from '../lib/storage';
+import { type Root, createRoot } from 'react-dom/client';
+import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
 import { request } from '../lib/request';
+import { type Solution, loadSolutionSelection } from '../lib/solution';
+import { DB } from '../lib/storage';
+import { type Hooker, addHooker } from '../lib/utils';
 
 const Panel = () => {
   const [modalShown, setModalShown] = useState(false);

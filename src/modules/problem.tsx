@@ -5,13 +5,13 @@ import { Dropdown } from '../components/Dropdown';
 import { Modal } from '../components/Modal';
 import { TagsSelection } from '../components/TagsSelection';
 import { problemDifficultyMapToOld, problemDifficultyName } from '../lib/difficulty';
-import type { ProblemInfo, StringifiedProblemInfo } from '../lib/lfeTypes';
+import type { ProblemInfo } from '../lib/lfeTypes';
+import { getProblemData } from '../lib/problem';
+import { request } from '../lib/request';
 import { DB } from '../lib/storage';
 import { showError, showSuccess } from '../lib/swal';
 import { type Tag, type TagSection, getFormattedTags, updateTagsIncrementally } from '../lib/tags';
 import { type Hooker, addHooker } from '../lib/utils';
-import { getProblemData } from '../lib/problem';
-import { request } from '../lib/request';
 
 const Panel = () => {
   const tagsDB = new DB('lfeData');
