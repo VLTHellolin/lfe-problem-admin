@@ -22,7 +22,7 @@ export const TagsSelection = ({ className, tags, selectedTags, onTagUpdate, ...p
   return (
     <div className={clsx('pa-tags', className)} {...props}>
       <div className='pa-tag-section shown'>
-        <input type='text' className='pa-tag-search lfe-form-sz-small' placeholder='搜索标签' onChange={e => setFilter(e.target.value)} />
+        <input type='text' className='pa-tag-search lform-size-small' placeholder='搜索标签' onChange={e => setFilter(e.target.value)} />
       </div>
 
       <div className='pa-tag-section shown'>

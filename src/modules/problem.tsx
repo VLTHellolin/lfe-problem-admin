@@ -92,8 +92,8 @@ const Panel = () => {
   };
 
   const handleSuccess = () => {
-    const list = [currentProblem.pid];
-    if (problemUpdateList) problemUpdateList.split(' ');
+    let list = [currentProblem.pid];
+    if (problemUpdateList) list = list.concat(problemUpdateList.split(' '));
     setModalShown(0);
 
     const problemNumberTags = problemTags.map(e => e.id);
@@ -145,7 +145,7 @@ const Panel = () => {
         <Modal header='题目管理' onSuccess={handleSuccess} onCancel={() => setModalShown(0)} long={modalShown === 3}>
           <div>
             如果你要批量操作题目，在下面输入其他题目的 PID，空格分隔。
-            <input type='text' className='lfe-form-sz-small' placeholder='P1001 P1002 ...' onChange={e => setProblemUpdateList(e.target.value)} />
+            <input type='text' className='lform-size-small' placeholder='P1001 P1002 ...' onChange={e => setProblemUpdateList(e.target.value)} />
           </div>
           <br />
           {modalShown === 1 && <ProblemSolution />}

@@ -119,6 +119,7 @@ const hooker: Hooker = {
   onMount(elements) {
     const rootElement = document.createElement('div');
     elements[0].appendChild(rootElement);
+    rootElement.id = 'pa-solution-panel';
 
     root = createRoot(rootElement);
     root.render(
