@@ -9,7 +9,7 @@ import type { ProblemInfo } from '../lib/lfeTypes';
 import { csPost } from '../lib/request';
 import { DB } from '../lib/storage';
 import { showError, showSuccess } from '../lib/swal';
-import { type TagSection, getFormattedTags, updateTagsIncrementally } from '../lib/tags';
+import { type Tag, type TagSection, getFormattedTags, updateTagsIncrementally } from '../lib/tags';
 import { type Hooker, addHooker } from '../lib/utils';
 import { getProblemData } from '../lib/problem';
 
@@ -20,7 +20,7 @@ const Panel = () => {
   const [currentProblem, setCurrentProblem] = useState({} as ProblemInfo);
   const [problemSolution, setProblemSolution] = useState(false);
   const [problemDifficulty, setProblemDifficulty] = useState(0);
-  const [problemTags, setProblemTags] = useState([] as number[]);
+  const [problemTags, setProblemTags] = useState([] as Tag[]);
 
   const [problemTagsInc, setProblemTagsInc] = useState(false);
   const [problemUpdateList, setProblemUpdateList] = useState('');
@@ -30,16 +30,15 @@ const Panel = () => {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: Only run after the initial render.
   useEffect(() => {
-    tagsDB.get('luoguTags').then(e => {
+    tagsDB.get('luoguTags').then(async e => {
       setTagList(getFormattedTags(e));
-    });
-    (async () => {
+
       const data = await getProblemData();
       if (data === undefined) return;
       setCurrentProblem(data);
       setProblemDifficulty(data.difficulty);
-      setProblemTags(data.tags);
-    })();
+      setProblemTags(Object.values(e).filter(t => data.tags.includes((t as Tag).id)) as Tag[]);
+    });
   }, []);
 
   const ProblemSolution = () => {
@@ -87,15 +86,7 @@ const Panel = () => {
           />
           增量更新（而非覆写更新）
         </label>
-        <TagsSelection
-          tags={tagList}
-          value={problemTags}
-          onModify={e => {
-            const index = problemTags.indexOf(e);
-            if (index === -1) setProblemTags([...problemTags, e]);
-            else setProblemTags(problemTags.filter(f => f !== e));
-          }}
-        />
+        <TagsSelection tags={tagList} selectedTags={problemTags} onTagUpdate={e => setProblemTags(e)} />
       </>
     );
   };
@@ -105,8 +96,10 @@ const Panel = () => {
     if (problemUpdateList) problemUpdateList.split(' ');
     setModalShown(0);
 
+    const problemNumberTags = problemTags.map(e => e.id);
+
     if (modalShown === 3 && problemTagsInc) {
-      updateTagsIncrementally(list, problemTags);
+      updateTagsIncrementally(list, problemNumberTags);
       return;
     }
 
@@ -116,7 +109,7 @@ const Panel = () => {
     } else if (modalShown === 2) {
       result.difficulty = problemDifficultyMapToOld(problemDifficulty);
     } else if (modalShown === 3) {
-      result.tags = problemTags;
+      result.tags = problemNumberTags;
     }
 
     Promise.all(list.map(e => csPost(`/sadmin/api/problem/partialUpdate/${e}`, result)))

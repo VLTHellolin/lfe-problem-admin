@@ -1,5 +1,5 @@
 .pa-tags {
-  .pa-tag-selection {
+  .pa-tag-section {
     border-bottom: 1px solid #e8e8e8;
     padding-bottom: 1.5em;
     display: none;
@@ -26,8 +26,9 @@
         display: inline-block;
       }
       &.selected {
-        background: #2949b4;
-        border-color: 1px solid #223e99;
+        background: #3956b6;
+        border-color: #304ba5;
+        color: #fff;
       }
     }
   }
