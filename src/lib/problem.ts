@@ -11,7 +11,7 @@ export const getProblemData = async () => {
   }
 
   const pid = result[1];
-  const resp = await (await request(`/problem/${pid}?_contentOnly=1`, { type: 'text/html' })).json();
+  const resp = await request(`/problem/${pid}?_contentOnly=1`, { type: 'text/html' });
 
   return resp.currentData.problem;
 };
