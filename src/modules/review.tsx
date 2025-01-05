@@ -2,10 +2,10 @@ import { StrictMode, useEffect, useState } from 'react';
 import { type Root, createRoot } from 'react-dom/client';
 import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
+import { cleanHistory, exportBackup, importBackup } from '../lib/backup';
 import { type Review, articleCategories } from '../lib/review';
 import { DB } from '../lib/storage';
 import { type Hooker, addHooker } from '../lib/utils';
-import { cleanHistory, exportBackup, importBackup } from '../lib/backup';
 
 const Panel = () => {
   const db = new DB('problem-admin-history', 2);
