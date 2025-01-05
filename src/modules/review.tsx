@@ -5,6 +5,7 @@ import { Modal } from '../components/Modal';
 import { type Review, articleCategories } from '../lib/review';
 import { DB } from '../lib/storage';
 import { type Hooker, addHooker } from '../lib/utils';
+import { cleanHistory, exportBackup, importBackup } from '../lib/backup';
 
 const Panel = () => {
   const db = new DB('problem-admin-history', 2);
@@ -93,24 +94,26 @@ const Panel = () => {
     if (a + b === 0) return `${a + b} / ${a} / ${b} / 0%`;
     return `${a + b} / ${a} / ${b} / ${((a / (a + b)) * 100).toFixed(2).toString()}%`;
   };
-  const confirmDelete = async () => {
-    if (window.confirm('确实要清除历史记录吗？所有数据将无法恢复！') && window.confirm('第二次确认，确实要清除吗？')) {
-      await db.clear();
-      window.alert('操作完成。');
-      window.location.reload();
-    }
-  };
 
   return (
     <>
       <Button theme='primary' spacing onClick={() => setModalShown(true)}>
         历史记录
       </Button>
-      <Button theme='error' spacing onClick={confirmDelete}>
-        清除记录
-      </Button>
       {modalShown && (
         <Modal header='历史记录' long onSuccess={() => setModalShown(false)}>
+          <div>
+            <Button theme='primary' size='middle' spacing onClick={importBackup}>
+              导入记录
+            </Button>
+            <Button theme='primary' size='middle' spacing onClick={exportBackup}>
+              导出记录
+            </Button>
+            <Button theme='error' size='middle' spacing onClick={cleanHistory}>
+              清空记录
+            </Button>
+          </div>
+          <br />
           总审核数量 / 通过 / 拒绝 / 通过率：
           {getRateText(totalCount[1], totalCount[0])}
           <br />
