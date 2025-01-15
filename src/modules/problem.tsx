@@ -13,8 +13,8 @@ import { showError, showSuccess } from '../lib/swal';
 import { type Tag, type TagSection, getFormattedTags, updateTagsIncrementally } from '../lib/tags';
 import { type Hooker, addHooker } from '../lib/utils';
 
+const tagsDB = new DB('lfeData');
 const Panel = () => {
-  const tagsDB = new DB('lfeData');
   const [tagList, setTagList] = useState([] as TagSection[]);
 
   const [currentProblem, setCurrentProblem] = useState({} as ProblemInfo);
@@ -28,7 +28,6 @@ const Panel = () => {
   const [dropdownShown, setDropdownShown] = useState(false);
   const [modalShown, setModalShown] = useState(0);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run after the initial render.
   useEffect(() => {
     tagsDB.get('luoguTags').then(async e => {
       setTagList(getFormattedTags(e));

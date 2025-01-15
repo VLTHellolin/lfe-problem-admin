@@ -7,17 +7,16 @@ import { type Review, articleCategories } from '../lib/review';
 import { DB } from '../lib/storage';
 import { type Hooker, addHooker } from '../lib/utils';
 
+const db = new DB('problem-admin-history', 2);
+let weekStart = new Date();
+let weekEnd = new Date();
 const Panel = () => {
-  const db = new DB('problem-admin-history', 2);
   const [modalShown, setModalShown] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [totalCount, setTotalCount] = useState([0, 0]);
   const [weekCount, setWeekCount] = useState([0, 0]);
   const [history, setHistory] = useState([] as Review[]);
-  let weekStart = new Date();
-  let weekEnd = new Date();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run after the initial render.
   useEffect(() => {
     (async () => {
       const dbHistory = (await db.get('history')) ?? [];
