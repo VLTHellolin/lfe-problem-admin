@@ -6,3 +6,7 @@
   font-size: .875em;
   padding: .125em .5em;
 }
+.theme-bg, .theme-fg {
+  filter: none !important;
+  backdrop-filter: none !important;
+}
