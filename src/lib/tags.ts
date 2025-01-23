@@ -64,7 +64,8 @@ export const updateTagsIncrementally = async (pid: string[], tags: number[]) => 
     if (index >= pid.length) return;
 
     for (let i = 0; i < maxConcurrentRequests && index < pid.length; i++) {
-      const result = await request(`/problem/${pid[index]}?_contentOnly=1`);
+      const result = await request(`/problem/${pid[index]}?_contentOnly=1`, { type: 'text/html' });
+      console.log(result);
       const newTags = [...new Set(tags.concat(result.currentData.problem.tags))];
       await request(`/sadmin/api/problem/partialUpdate/${pid[index]}`, {
         method: 'POST',
