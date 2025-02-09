@@ -1,15 +1,15 @@
-import clsx from 'clsx';
 import type React from 'react';
-import { useState } from 'react';
 import type { Tag, TagSection } from '../lib/tags';
+import clsx from 'clsx';
+import { useState } from 'react';
 
-export interface TagsSelectionProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TagsSelectionProps {
   tags: TagSection[];
   selectedTags: Tag[];
   onTagUpdate?: (t: Tag[]) => void;
 }
 
-export const TagsSelection = ({ className, tags, selectedTags, onTagUpdate, ...props }: TagsSelectionProps) => {
+export const TagsSelection = ({ tags, selectedTags, onTagUpdate }: TagsSelectionProps) => {
   const [filter, setFilter] = useState('');
 
   const tagUpdateHandler = (t: Tag) => {
@@ -20,16 +20,22 @@ export const TagsSelection = ({ className, tags, selectedTags, onTagUpdate, ...p
   };
 
   return (
-    <div className={clsx('pa-tags', className)} {...props}>
+    <div className='pa-tags'>
       <div className='pa-tag-section shown'>
-        <input type='text' className='pa-tag-search lform-size-small' placeholder='搜索标签' onChange={e => setFilter(e.target.value)} />
+        <input type='text' className='pa-tag-search lform-size-small' placeholder='搜索标签' onChange={e => {
+          setFilter(e.target.value);
+        }}
+        />
       </div>
 
       <div className='pa-tag-section shown'>
         <div className='pa-tag-title'>已选择标签</div>
         <div className='pa-tag-list'>
           {selectedTags.map(t => (
-            <button key={t.id} type='button' className='lfe-caption pa-tag selected shown' onClick={() => tagUpdateHandler(t)}>
+            <button key={t.id} type='button' className='lfe-caption pa-tag selected shown' onClick={() => {
+              tagUpdateHandler(t);
+            }}
+            >
               {t.name}
             </button>
           ))}
@@ -47,10 +53,12 @@ export const TagsSelection = ({ className, tags, selectedTags, onTagUpdate, ...p
                 className={clsx(
                   'lfe-caption',
                   'pa-tag',
-                  selectedTags?.some(e => e.id === t.id) && 'selected',
-                  t.name.toLowerCase().includes(filter.toLowerCase()) && 'shown'
+                  selectedTags.some(e => e.id === t.id) && 'selected',
+                  t.name.toLowerCase().includes(filter.toLowerCase()) && 'shown',
                 )}
-                onClick={() => tagUpdateHandler(t)}
+                onClick={() => {
+                  tagUpdateHandler(t);
+                }}
               >
                 {t.name}
               </button>

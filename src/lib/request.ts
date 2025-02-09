@@ -13,5 +13,5 @@ export const request = async (url: string, { method, headers, body, type }: Requ
   if (!resp.ok) {
     throw new Error(resp.statusText);
   }
-  return await resp.json();
+  return resp.text();
 };

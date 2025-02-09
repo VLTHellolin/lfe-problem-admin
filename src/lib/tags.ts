@@ -1,3 +1,4 @@
+import { getProblemData } from './problem';
 import { request } from './request';
 import { showError, showSuccess } from './swal';
 
@@ -33,13 +34,33 @@ export const getFormattedTags = (tags: Record<number, Tag>) => {
   });
   for (const tag of Object.values(tags)) {
     if ((tag.type === 'Algorithm' || tag.type === 'Origin') && tag.id !== -2 && tag.parent === null) {
-      result.push({ id: tag.id, name: tag.name, children: [tag] });
+      result.push({
+        id: tag.id,
+        name: tag.name,
+        children: [tag],
+      });
     }
   }
-  result.push({ id: -10, name: '时间', children: [] });
-  result.push({ id: -11, name: '区域', children: [] });
-  result.push({ id: -12, name: '特殊题目', children: [] });
-  result.push({ id: -13, name: '不可用标签', children: [] });
+  result.push({
+    id: -10,
+    name: '时间',
+    children: [],
+  });
+  result.push({
+    id: -11,
+    name: '区域',
+    children: [],
+  });
+  result.push({
+    id: -12,
+    name: '特殊题目',
+    children: [],
+  });
+  result.push({
+    id: -13,
+    name: '不可用标签',
+    children: [],
+  });
 
   const getSectionId = (e: Tag) => {
     const unlistedSectionId = ['Time', 'Region', 'SpecialProblem', 'Others'].indexOf(e.type);
@@ -64,9 +85,8 @@ export const updateTagsIncrementally = async (pid: string[], tags: number[]) => 
     if (index >= pid.length) return;
 
     for (let i = 0; i < maxConcurrentRequests && index < pid.length; i++) {
-      const result = await request(`/problem/${pid[index]}?_contentOnly=1`, { type: 'text/html' });
-      console.log(result);
-      const newTags = [...new Set(tags.concat(result.currentData.problem.tags))];
+      const currentProblem = await getProblemData(pid[index]);
+      const newTags = [...new Set(tags.concat(currentProblem.tags))];
       await request(`/sadmin/api/problem/partialUpdate/${pid[index]}`, {
         method: 'POST',
         body: { tags: newTags },

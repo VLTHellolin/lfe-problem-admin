@@ -37,7 +37,7 @@ export const loadSolutionSelection = async () => {
       } else {
         selectedSolutionList = selectedSolutionList.filter(e => e.id !== solution.lid);
       }
-      db.set('selected', selectedSolutionList);
+      void db.set('selected', selectedSolutionList);
     });
 
     solutionOperation.prepend(solutionLabel);
