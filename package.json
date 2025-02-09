@@ -12,7 +12,6 @@
     "check": "biome check --write ."
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
@@ -27,7 +26,9 @@
     "vite-plugin-monkey": "^5.0.5"
   },
   "dependencies": {
+    "@hellolin/eslint-config": "^0.2.0",
     "clsx": "^2.1.1",
+    "eslint": "^9.20.0",
     "idb": "^8.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
