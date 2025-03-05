@@ -1,5 +1,6 @@
 {
   "name": "lfe-problem-admin",
+  "private": true,
   "description": "Problem management panel for lfe",
   "version": "2.4.0",
   "author": "hellolin",
@@ -16,6 +17,7 @@
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "bumpp": "^10.0.3",
     "postcss": "^8.5.1",
     "postcss-combine-duplicated-selectors": "^10.0.3",
     "postcss-discard-empty": "^7.0.0",
