@@ -15,6 +15,7 @@
   "devDependencies": {
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "@types/throttle-debounce": "^5.0.2",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "bumpp": "^10.0.3",
@@ -34,6 +35,7 @@
     "idb": "^8.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "sweetalert2": "^11.15.10"
+    "sweetalert2": "^11.15.10",
+    "throttle-debounce": "^5.0.2"
   }
 }

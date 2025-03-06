@@ -5,13 +5,15 @@ export interface Hooker {
   pathSelector: RegExp;
 }
 
-interface HookerWithStatus extends Hooker {
-  mounted: boolean;
+interface HookerWithStatus extends Hooker {mounted: boolean;
 }
 const hookerList: HookerWithStatus[] = [];
 
 export const addHooker = (hooker: Hooker) => {
-  const initHooker: HookerWithStatus = { ...hooker, mounted: false };
+  const initHooker: HookerWithStatus = {
+    ...hooker,
+    mounted: false,
+  };
   hookerList.push(initHooker);
   triggerHooker(initHooker);
 };
@@ -37,4 +39,8 @@ const observer = new MutationObserver(() => {
   }
 });
 
-observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+  attributes: true,
+});

@@ -1,12 +1,12 @@
-import Swal from 'sweetalert2';
 import type { Review } from './review';
+import Swal from 'sweetalert2';
 import { DB } from './storage';
 
 export const exportBackup = async () => {
   const db = new DB('problem-admin-history', 2);
   const history: Review[] | undefined = await db.get('history');
   if (history === undefined || history.length === 0) {
-    Swal.fire({
+    await Swal.fire({
       icon: 'error',
       title: '导出失败',
       text: '没有数据可以导出。',
@@ -26,12 +26,10 @@ export const importBackup = async () => {
   const { value: file }: { value?: File } = await Swal.fire({
     title: '选择文件',
     input: 'file',
-    inputAttributes: {
-      accept: 'application/json',
-    },
+    inputAttributes: { accept: 'application/json' },
   });
   if (!file) {
-    Swal.fire({
+    await Swal.fire({
       icon: 'error',
       title: '导入失败',
       text: '没有选择文件。',
@@ -42,7 +40,7 @@ export const importBackup = async () => {
   const reader = new FileReader();
   reader.onload = async e => {
     if (!e.target?.result) {
-      Swal.fire({
+      await Swal.fire({
         icon: 'error',
         title: '导入失败',
         text: '文件内容为空。',
@@ -52,7 +50,7 @@ export const importBackup = async () => {
     const db = new DB('problem-admin-history', 2);
     const data = JSON.parse(e.target.result as string);
     await db.set('history', data);
-    Swal.fire({
+    await Swal.fire({
       icon: 'success',
       title: '导入成功',
     });
@@ -69,8 +67,8 @@ export const cleanHistory = async () => {
   });
   if (isConfirmed) {
     const db = new DB('problem-admin-history', 2);
-    db.set('history', []);
-    Swal.fire({
+    await db.set('history', []);
+    await Swal.fire({
       icon: 'success',
       title: '清空成功',
     });

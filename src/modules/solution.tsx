@@ -144,10 +144,10 @@ addHooker(hooker);
 
 const solutionSelectionHooker: Hooker = {
   onMount() {
-    void loadSolutionSelection();
+    loadSolutionSelection();
   },
   onUnmount() {},
-  selector: '.main-container main .solution-list',
+  selector: '.main-container main .solution-list .solution-article',
   pathSelector: /^\/problem\/solution\/.*$/,
 };
 
