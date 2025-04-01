@@ -4,7 +4,7 @@ declare global {
   const _feInjection: FeInjection | undefined;
 }
 
-import './assets/index.css';
+import 'virtual:uno.css';
 import './modules/problem';
 import './modules/review';
 import './modules/solution';

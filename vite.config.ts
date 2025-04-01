@@ -1,4 +1,5 @@
 import reactPlugin from '@vitejs/plugin-react';
+import unoCSS from 'unocss/vite';
 import { defineConfig } from 'vite';
 import monkey from 'vite-plugin-monkey';
 import pkg from './package.json';
@@ -7,6 +8,7 @@ export default defineConfig({
   build: { minify: true },
   plugins: [
     reactPlugin(),
+    unoCSS(),
     monkey({
       entry: 'src/index.ts',
       build: {
