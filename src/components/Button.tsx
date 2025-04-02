@@ -43,6 +43,7 @@ export const Button = ({ children, className, theme, spacing, size, ...props }: 
       mr-2
       line-height='1.5'
       border='1 solid #bfbfbf'
+      hover:opacity='85'
       className={themeVariants({ theme, spacing, size, className })}
       {...props}
     >

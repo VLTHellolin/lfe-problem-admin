@@ -1,7 +1,3 @@
-import { getProblemData } from './problem';
-import { request } from './request';
-import { showError, showSuccess } from './swal';
-
 export interface Tag {
   id: number;
   name: string;
@@ -73,37 +69,4 @@ export const getFormattedTags = (tags: Record<number, Tag>) => {
     result.find(e => e.id === getSectionId(tag))?.children.push(tag);
   }
   return result;
-};
-
-export const updateTagsIncrementally = async (pid: string[], tags: number[]) => {
-  const maxConcurrentRequests = 3;
-  const requestDelay = 700;
-
-  let index = 0;
-
-  const processQueue = async () => {
-    if (index >= pid.length) return;
-
-    for (let i = 0; i < maxConcurrentRequests && index < pid.length; i++) {
-      const currentProblem = await getProblemData(pid[index]);
-      const newTags = [...new Set(tags.concat(currentProblem.tags))];
-      await request(`/sadmin/api/problem/partialUpdate/${pid[index]}`, {
-        method: 'POST',
-        body: { tags: newTags },
-      });
-      index++;
-    }
-
-    await new Promise(r => setTimeout(r, requestDelay));
-    await processQueue();
-  };
-
-  try {
-    await processQueue();
-  } catch (err) {
-    showError(err);
-    return;
-  }
-
-  showSuccess();
 };

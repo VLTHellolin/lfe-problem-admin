@@ -1,192 +1,188 @@
-import type React from 'react';
-import type { ProblemInfo } from '../lib/lfeTypes';
-import { StrictMode, useEffect, useState } from 'react';
+import { createContext, StrictMode, use, useMemo, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
+import useSWR from 'swr';
 import { Button } from '../components/Button';
 import { Dropdown } from '../components/Dropdown';
 import { Modal } from '../components/Modal';
-import { TagsSelection } from '../components/TagsSelection';
-import { problemDifficultyMapToOld, problemDifficultyName } from '../lib/difficulty';
-import { getProblemData } from '../lib/problem';
+import { Tag as TagComponent } from '../components/Tag';
 import { request } from '../lib/request';
 import { DB } from '../lib/storage';
 import { showError, showSuccess } from '../lib/swal';
-import { getFormattedTags, type Tag, type TagSection, updateTagsIncrementally } from '../lib/tags';
+import { getFormattedTags, type Tag } from '../lib/tags';
 import { addHooker, type Hooker } from '../lib/utils';
 
-const tagsDB = new DB('lfeData');
-const ProblemSolution = (props: React.ComponentProps<'input'>) => {
+const LfeDataDB = new DB('lfeData');
+
+const PidContext = createContext<string>('');
+
+interface ProblemData {
+  acceptSolution: boolean;
+  difficulty: number;
+  tags: number[];
+}
+
+const problemDifficultyName = ['暂无评定', '入门', '普及-', '普及/提高-', '普及+/提高', '提高+/省选-', '省选/NOI-', 'NOI/NOI+/CTSC'];
+const problemDifficultyMapToOld = (d: number) => [0, 2, 3, 5, 6, 8, 10, 11][d];
+
+const useProblemData = (pid: string) => {
+  const { data, error, isLoading } = useSWR(`/problem/${pid}`);
+
+  const problemDocument = new DOMParser().parseFromString(data, 'text/html');
+  const problemData: ProblemData = JSON.parse(problemDocument.querySelector('#lentille-context')?.textContent as any).data.problem;
+
+  return {
+    problem: problemData,
+    isError: error,
+    isLoading,
+  };
+};
+
+const updateProblemData = async (pid: string, data: Partial<ProblemData>) => {
+  const result = data;
+  if (data.difficulty !== undefined) {
+    result.difficulty = problemDifficultyMapToOld(data.difficulty);
+  }
+
+  try {
+    await request(`/sadmin/api/problem/partialUpdate/${pid}`, {
+      method: 'POST',
+      body: result,
+    });
+    showSuccess();
+  } catch (err) {
+    showError(err);
+  }
+};
+
+const ToggleProblemSolution = () => {
+  const pid = use(PidContext);
+  const { problem } = useProblemData(pid);
+
+  const [solution, setSolution] = useState(problem.acceptSolution);
+
   return (
-    <label>
-      <input type='checkbox' {...props} />
-      <span>&nbsp;选中为开，不选为关</span>
-    </label>
+    <Modal header='管理题目' onSuccess={() => { void updateProblemData(pid, { acceptSolution: solution }); }}>
+      <label>
+        <input type='checkbox' checked={solution} onChange={() => { setSolution(!solution); }} />
+        <span ml-2>选中为开，不选为关</span>
+      </label>
+    </Modal>
   );
 };
 
-const ProblemDifficulty = ({ currentProblem, value, ...props }: Omit<React.ComponentProps<'select'>, 'value'> & {
-  currentProblem: ProblemInfo;
-  value: number;
-}) => {
-  const isDeltaTooSmall = () =>
-    currentProblem.difficulty !== 0 && value !== 0 && Math.abs(currentProblem.difficulty - value) === 1;
+const ToggleProblemDifficulty = () => {
+  const pid = use(PidContext);
+  const { problem } = useProblemData(pid);
+
+  const [difficulty, setDifficulty] = useState(problem.difficulty);
+
   return (
-    <>
-      <select value={value} {...props}>
-        {problemDifficultyName.map((e, i) => (
-          <option key={e} value={i}>
-            {e}
+    <Modal header='管理题目' onSuccess={() => { void updateProblemData(pid, { difficulty }); }}>
+      <select value={difficulty} onChange={e => { setDifficulty(Number(e.target.value)); }}>
+        {problemDifficultyName.map((name, index) => (
+          <option key={name} value={index}>
+            {name}
           </option>
         ))}
       </select>
-      {isDeltaTooSmall() && (
-        <div style={{ color: '#e74c3c' }}>
-          你即将把此题难度从 {problemDifficultyName[currentProblem.difficulty]} 更改到 {problemDifficultyName[value]}。<br />
-          管理组认为，两个跨度及以上的难度更改才是必要的。请再三思考是否有必要改动难度。
-        </div>
-      )}
-    </>
+    </Modal>
   );
 };
 
-const ProblemTags = ({ tags, selectedTags, onTagUpdate, ...props }: React.ComponentProps<'input'> & React.ComponentProps<typeof TagsSelection>) => {
+const ModifyProblemTags = () => {
+  const pid = use(PidContext);
+  const { problem } = useProblemData(pid);
+  const rawTags = useMemo<Record<number, Tag>>(
+    () => use(LfeDataDB.get('luoguTags')),
+    [],
+  );
+  const tags = useMemo(
+    () => getFormattedTags(rawTags),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const [filter, setFilter] = useState('');
+  const [selectedTags, setSelectedTags] = useState(problem.tags);
+
+  const updateSelectedTags = (t: number) => {
+    let nextTags = Array.from(selectedTags);
+    if (nextTags.some(e => e === t))
+      nextTags = nextTags.filter(e => e !== t);
+    else
+      nextTags.push(t);
+    setSelectedTags(nextTags);
+  };
+
   return (
-    <>
-      <label>
-        <input
-          type='checkbox'
-          {...props}
-        />
-        增量更新（而非覆写更新）
-      </label>
-      <TagsSelection tags={tags} selectedTags={selectedTags} onTagUpdate={onTagUpdate} />
-    </>
+    <Modal header='管理题目'>
+      <div>
+        <input type='text' placeholder='搜索标签' onChange={e => { setFilter(e.target.value); }} />
+      </div>
+
+      <div>
+        <div m-4 color='#e8e8e8' />
+        <h4>已选择的标签</h4>
+        <div>
+          {selectedTags.map(e => (
+            <TagComponent
+              key={rawTags[e].id}
+              selected
+              onClick={() => { updateSelectedTags(e); }}
+            >
+              {rawTags[e].name}
+            </TagComponent>
+          ))}
+        </div>
+      </div>
+
+      {tags.map(section => (
+        <div key={section.name}>
+          <div m-4 color='#e8e8e8' />
+          <h4>{section.name}</h4>
+          <div>
+            {section.children.map(e => (
+              <TagComponent
+                key={e.id}
+                hidden={!e.name.toLowerCase().includes(filter.toLowerCase()) }
+                selected={selectedTags.some(f => f === e.id)}
+                onClick={() => { updateSelectedTags(e.id); }}
+              >
+                {e.name}
+              </TagComponent>
+            ))}
+          </div>
+        </div>
+      ))}
+    </Modal>
   );
 };
 
 const Panel = () => {
-  const [tags, setTags] = useState([] as TagSection[]);
+  const pid = (/^\/problem\/(.*)$/.exec(location.pathname))![1];
+  const operations = ['题解通道', '题目难度', '题目标签'];
 
-  const [currentProblem, setCurrentProblem] = useState({} as ProblemInfo);
-  const [problemSolution, setProblemSolution] = useState(false);
-  const [problemDifficulty, setProblemDifficulty] = useState(0);
-  const [problemTags, setProblemTags] = useState([] as Tag[]);
-
-  const [problemTagsInc, setProblemTagsInc] = useState(false);
-  const [problemUpdateList, setProblemUpdateList] = useState('');
-
-  const [dropdownShown, setDropdownShown] = useState(false);
-  const [modalShown, setModalShown] = useState(0);
-
-  useEffect(() => {
-    void tagsDB.get('luoguTags').then(async e => {
-      setTags(getFormattedTags(e));
-
-      const data = await getProblemData();
-      if (data === undefined) return;
-      setCurrentProblem(data);
-      setProblemDifficulty(data.difficulty);
-      setProblemTags(Object.values(e).filter(t => data.tags.includes((t as Tag).id)) as Tag[]);
-    });
-  }, []);
-
-
-  const handleSuccess = () => {
-    let list = [currentProblem.pid];
-    if (problemUpdateList) list = list.concat(problemUpdateList.split(' '));
-    setModalShown(0);
-
-    const problemNumberTags = problemTags.map(e => e.id);
-
-    if (modalShown === 3 && problemTagsInc) {
-      void updateTagsIncrementally(list, problemNumberTags);
-      return;
-    }
-
-    const result: Partial<ProblemInfo> = {};
-    if (modalShown === 1) {
-      result.acceptSolution = problemSolution;
-    } else if (modalShown === 2) {
-      result.difficulty = problemDifficultyMapToOld(problemDifficulty);
-    } else if (modalShown === 3) {
-      result.tags = problemNumberTags;
-    }
-
-    Promise.all(list.map(e => request(`/sadmin/api/problem/partialUpdate/${e}`, {
-      method: 'POST',
-      body: result,
-    })))
-      .then(() => {
-        showSuccess();
-      })
-      .catch(err => {
-        showError(err);
-      });
-  };
+  const [shownDropdown, setShownDropdown] = useState(false);
+  const [openedModal, setOpenedModal] = useState<number | null>(null);
 
   return (
-    <>
+    <PidContext value={pid}>
       <span>
-        <Button theme='dark' onClick={() => {
-          setDropdownShown(!dropdownShown);
-        }}
-        >
-          管理题目
-        </Button>
-        {dropdownShown && (
+        <Button theme='dark' onClick={() => { setShownDropdown(true); }}>管理题目</Button>
+        {shownDropdown && (
           <Dropdown>
-            <Button theme='primary' onClick={() => {
-              setModalShown(1);
-            }}
-            >
-              题解通道
-            </Button>
-            <Button theme='primary' onClick={() => {
-              setModalShown(2);
-            }}
-            >
-              题目难度
-            </Button>
-            <Button theme='primary' onClick={() => {
-              setModalShown(3);
-            }}
-            >
-              题目标签
-            </Button>
+            {operations.map((name, index) => (
+              <Button key={name} theme='primary' onClick={() => { setOpenedModal(index); }}>
+                {name}
+              </Button>
+            ))}
           </Dropdown>
         )}
       </span>
-      {modalShown !== 0 && (
-        <Modal header='题目管理' onSuccess={handleSuccess} onCancel={() => {
-          setModalShown(0);
-        }} long={modalShown === 3}
-        >
-          <div>
-            如果你要批量操作题目，在下面输入其他题目的 PID，空格分隔。
-            <input type='text' className='lform-size-small' placeholder='P1001 P1002 ...' onChange={e => {
-              setProblemUpdateList(e.target.value);
-            }}
-            />
-          </div>
-          <br />
-          {modalShown === 1 && <ProblemSolution checked={problemSolution} onChange={e => {
-            setProblemSolution(e.target.checked);
-          }}
-          />}
-          {modalShown === 2 && <ProblemDifficulty currentProblem={currentProblem} value={problemDifficulty} onChange={e => {
-            setProblemDifficulty(Number(e.target.value));
-          }}
-          />}
-          {modalShown === 3 && <ProblemTags checked={problemTagsInc} onChange={e => {
-            setProblemTagsInc(e.target.checked);
-            setProblemTags([]);
-          }} tags={tags} selectedTags={problemTags} onTagUpdate={e => {
-            setProblemTags(e);
-          }}
-          />}
-        </Modal>
-      )}
-    </>
+      {openedModal === 1 && <ToggleProblemSolution />}
+      {openedModal === 2 && <ToggleProblemDifficulty />}
+      {openedModal === 3 && <ModifyProblemTags />}
+    </PidContext>
   );
 };
 
