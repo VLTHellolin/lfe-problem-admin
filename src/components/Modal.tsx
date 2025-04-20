@@ -33,7 +33,7 @@ export const Modal = ({ children, header, long, onSuccess, onCancel, ...props }:
         text-black
         shadow='sm #1a1a1a1a'
         style={{
-          // I don't know why but TS won't let me do this using UnoCSS
+          /* I don't know why but TS won't let me do this using UnoCSS */
           top: '50%', left: '50%',
           transform: 'translate(-50%, -50%)',
           ...long ? { height: '600px' } : {},
