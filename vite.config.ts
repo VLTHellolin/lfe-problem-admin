@@ -1,4 +1,5 @@
 import reactPlugin from '@vitejs/plugin-react';
+import unoCSS from 'unocss/vite';
 import { defineConfig } from 'vite';
 import monkey from 'vite-plugin-monkey';
 import pkg from './package.json';
@@ -7,13 +8,14 @@ export default defineConfig({
   build: { minify: true },
   plugins: [
     reactPlugin(),
+    unoCSS(),
     monkey({
       entry: 'src/index.ts',
       build: {
         externalGlobals: {
-          'react': ['React', 'https://cdn.hellolin.top/npm/react@18.3.1/umd/react.production.min.js'],
-          'react-dom': ['ReactDOM', 'https://cdn.hellolin.top/npm/react-dom@18.3.1/umd/react-dom.production.min.js'],
-          'sweetalert2': ['Swal', 'https://cdn.hellolin.top/npm/sweetalert2@11.17.2/dist/sweetalert2.all.min.js'],
+          // 'react': ['React', 'https://cdn.hellolin.top/npm/react@18.3.1/umd/react.production.min.js'],
+          // 'react-dom': ['ReactDOM', 'https://cdn.hellolin.top/npm/react-dom@18.3.1/umd/react-dom.production.min.js'],
+          sweetalert2: ['Swal', 'https://cdn.hellolin.top/npm/sweetalert2@11.17.2/dist/sweetalert2.all.min.js'],
         },
       },
       userscript: {

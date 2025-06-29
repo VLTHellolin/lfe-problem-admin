@@ -2,6 +2,9 @@
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["dist", "node_modules"],
   "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "target": "ESNext",
     "module": "ESNext",
