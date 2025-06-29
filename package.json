@@ -27,6 +27,7 @@
     "@hellolin/eslint-config": "^0.4.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "es-toolkit": "^1.39.5",
     "eslint": "^9.21.0",
     "idb": "^8.0.2",
     "react": "^19.1.0",
